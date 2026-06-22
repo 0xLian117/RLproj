@@ -11,6 +11,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import shutil
 from collections import defaultdict
 
 from rlve.envs.registry import make_env
@@ -160,6 +161,9 @@ def main():
     print(f"[eval] {args.tag}: train={result['train_avg']} "
           f"heldout={result['heldout_avg']} overall={result['overall_avg']} "
           f"-> {out_path}")
+
+    # Free disk: delete any merged-model scratch dir (can be several GB).
+    shutil.rmtree(work_dir, ignore_errors=True)
 
 
 if __name__ == "__main__":
