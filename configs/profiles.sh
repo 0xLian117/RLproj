@@ -30,8 +30,18 @@ case "$PROFILE" in
     VLLM_MEM="${VLLM_MEM:-0.40}"
     LORA_FLAG="${LORA_FLAG:---lora}"
     ;;
+  4090x48)
+    # Single 48GB card (RTX 4090 48GB). LoRA on 1.5B with a full-size batch;
+    # plenty of headroom. Recommended setup for one 48GB GPU.
+    NUM_GEN="${NUM_GEN:-8}"
+    PROMPTS_PER_STEP="${PROMPTS_PER_STEP:-8}"      # -> pdtbs = 64
+    MAX_PROMPT_LEN="${MAX_PROMPT_LEN:-384}"
+    MAX_COMPLETION_LEN="${MAX_COMPLETION_LEN:-640}"
+    VLLM_MEM="${VLLM_MEM:-0.30}"
+    LORA_FLAG="${LORA_FLAG:---lora}"
+    ;;
   *)
-    echo "Unknown PROFILE=$PROFILE (use 'h200' or '4090')" >&2; exit 1;;
+    echo "Unknown PROFILE=$PROFILE (use 'h200', '4090x48' or '4090')" >&2; exit 1;;
 esac
 
 # ----------------------------------------------------------------------------

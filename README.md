@@ -85,6 +85,9 @@ generation automatically.
 # default: single H200, full fine-tune of Qwen2.5-1.5B-Instruct, 200 steps
 bash scripts/run_all.sh
 
+# single 48GB card (RTX 4090 48GB): LoRA + full-size batch (recommended for 48GB)
+PROFILE=4090x48 bash scripts/run_all.sh
+
 # 24GB cards (2×4090 or one 4090): LoRA + smaller batches
 PROFILE=4090 bash scripts/run_all.sh
 
