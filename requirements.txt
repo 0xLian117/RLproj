@@ -1,0 +1,18 @@
+# --- Core (required) -------------------------------------------------------
+# IMPORTANT: install a CUDA build of torch FIRST (most cloud GPU images already
+# ship one). If you create the venv with --system-site-packages (see
+# scripts/setup_remote.sh) the image's CUDA torch is reused automatically.
+torch>=2.4
+transformers>=4.51
+trl>=0.18
+datasets>=2.19
+accelerate>=0.34
+peft>=0.12
+numpy>=1.24
+matplotlib>=3.7
+
+# --- Optional (faster rollout generation) ----------------------------------
+# vLLM accelerates generation a lot but is sensitive to the torch/CUDA version.
+# It is OPTIONAL: rlve/train.py and rlve/evaluate.py fall back to HuggingFace
+# generate automatically if vLLM is not importable. Install separately:
+#   pip install vllm

@@ -1,0 +1,33 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+*.egg-info/
+.ipynb_checkpoints/
+
+# Model weights & large training artifacts (DO NOT commit these)
+*.safetensors
+*.bin
+*.pt
+*.pth
+results/runs/*/checkpoint-*/
+results/runs/*/merged/
+results/runs/_smoke/
+results/eval/_work_*/
+results/**/tokenizer.json
+results/**/tokenizer_config.json
+results/**/vocab.json
+results/**/merges.txt
+results/eval_set.json
+results/_smoke_eval_set.json
+rlve_results.tgz
+
+# Keep the lightweight results: figures, reports, jsonl logs, eval jsons
+# (these are explicitly NOT ignored so they can be committed back)
+!results/figures/
+!results/REPORT.md
+
+# OS
+.DS_Store
