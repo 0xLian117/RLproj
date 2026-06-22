@@ -116,6 +116,17 @@ MODEL_A=/path/to/big MODEL_B=/path/to/small bash scripts/run_2gpu.sh
 Tips for a bigger / reasoning model: if it emits long chain-of-thought, give it
 room with `MAX_COMPLETION_LEN=1280`; if it OOMs, lower `PROMPTS_PER_STEP=6` and
 `VLLM_MEM=0.25`.
+
+**Both cards on ONE model (e.g. a single 4B run):** dedicate one GPU to a vLLM
+generation server and train on the other. Training stays single-process (the
+adaptive curriculum is untouched) and the training card is freed from a
+colocated vLLM, so the 4B can use a full-size batch:
+```bash
+OUT_ROOT=/big/disk/rlve_out  MODEL=/path/to/Qwen3.5-4B  bash scripts/run_4b_2gpu.sh
+```
+(GPU1 runs `trl vllm-serve`; GPU0 trains in `--vllm-mode server`. If the server
+won't start, fall back to one card:
+`GPU=0 MODEL=... PROFILE=4090x48 PROMPTS_PER_STEP=4 VLLM_MEM=0.4 bash scripts/run_all.sh`.)
 `run_all.sh` does, in order: CPU self-test → CPU simulation → **GPU smoke test
 (fails fast if the stack is broken)** → build eval set → eval base model →
 train+eval the 4 conditions → make figures + `results/REPORT.md` → package

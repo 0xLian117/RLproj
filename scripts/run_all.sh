@@ -30,6 +30,9 @@ export TRANSFORMERS_OFFLINE="${TRANSFORMERS_OFFLINE:-1}"
 source configs/profiles.sh
 
 RESULTS="${RESULTS_DIR:-results}"
+VLLM_MODE="${VLLM_MODE:-colocate}"   # colocate | server
+VLLM_HOST="${VLLM_HOST:-0.0.0.0}"
+VLLM_PORT="${VLLM_PORT:-8000}"
 mkdir -p "$RESULTS/logs" "$RESULTS/runs" "$RESULTS/eval" "$RESULTS/sim"
 START=$(date +%s)
 echo "================ RLVE-lite run_all ================"
@@ -53,6 +56,7 @@ python tools/simulate.py --out "$RESULTS/sim" 2>&1 | tee "$RESULTS/logs/sim.log"
 if [ "${SKIP_SMOKE:-0}" != "1" ]; then
   echo "### [2/6] GPU smoke test"
   MODEL="$MODEL" LORA_FLAG="$LORA_FLAG" RESULTS_DIR="$RESULTS" \
+    VLLM_MODE="$VLLM_MODE" VLLM_HOST="$VLLM_HOST" VLLM_PORT="$VLLM_PORT" \
     bash scripts/smoke_test.sh 2>&1 | tee "$RESULTS/logs/smoke.log"
   [ "${PIPESTATUS[0]}" -eq 0 ] || fatal "smoke test failed — fix before the full run"
 else
@@ -83,6 +87,7 @@ for spec in "${CONDITIONS[@]}"; do
       --max-prompt-length "$MAX_PROMPT_LEN" \
       --max-completion-length "$MAX_COMPLETION_LEN" \
       --vllm-gpu-mem "$VLLM_MEM" \
+      --vllm-mode "$VLLM_MODE" --vllm-server-host "$VLLM_HOST" --vllm-server-port "$VLLM_PORT" \
       --output-dir "$RESULTS/runs/$tag" 2>&1 | tee "$RESULTS/logs/train_$tag.log"; then
     if python -m rlve.evaluate --model "$RESULTS/runs/$tag" --tag "$tag" \
         --eval-set "$RESULTS/eval_set.json" --n-per "$EVAL_N_PER" \

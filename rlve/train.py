@@ -54,6 +54,11 @@ def parse_args():
     p.add_argument("--lora", action="store_true")
     p.add_argument("--no-vllm", action="store_true")
     p.add_argument("--vllm-gpu-mem", type=float, default=0.3)
+    p.add_argument("--vllm-mode", default="colocate", choices=["colocate", "server"],
+                   help="colocate: vLLM shares the training GPU; "
+                        "server: connect to a separate `trl vllm-serve` process")
+    p.add_argument("--vllm-server-host", default="0.0.0.0")
+    p.add_argument("--vllm-server-port", type=int, default=8000)
     p.add_argument("--bf16", action="store_true", default=True)
     p.add_argument("--gradient-checkpointing", action="store_true", default=True)
     p.add_argument("--wandb", action="store_true")
@@ -137,7 +142,9 @@ def main():
         mask_truncated_completions=True,
         scale_rewards=True,
         use_vllm=use_vllm,
-        vllm_mode="colocate",
+        vllm_mode=args.vllm_mode,
+        vllm_server_host=args.vllm_server_host,
+        vllm_server_port=args.vllm_server_port,
         vllm_gpu_memory_utilization=args.vllm_gpu_mem,
         report_to=(["wandb"] if args.wandb else []),
         remove_unused_columns=False,

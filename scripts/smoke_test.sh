@@ -17,14 +17,18 @@ MODEL="${MODEL:-Qwen/Qwen2.5-1.5B-Instruct}"
 LORA_FLAG="${LORA_FLAG:-}"
 RESULTS="${RESULTS_DIR:-results}"
 SMOKE_DIR="${SMOKE_DIR:-$RESULTS/runs/_smoke}"
+VLLM_MODE="${VLLM_MODE:-colocate}"
+VLLM_HOST="${VLLM_HOST:-0.0.0.0}"
+VLLM_PORT="${VLLM_PORT:-8000}"
 
-echo "== SMOKE: tiny GRPO train (gpu='${CUDA_VISIBLE_DEVICES:-all}' model=$MODEL lora='${LORA_FLAG}') =="
+echo "== SMOKE: tiny GRPO train (gpu='${CUDA_VISIBLE_DEVICES:-all}' model=$MODEL lora='${LORA_FLAG}' vllm=$VLLM_MODE) =="
 python -m rlve.train \
   --condition smoke --controller stad --sampler lp $LORA_FLAG \
   --model "$MODEL" --max-steps 3 \
   --num-generations 4 --prompts-per-step 2 \
   --max-prompt-length 256 --max-completion-length 128 \
   --vllm-gpu-mem 0.30 --logging-steps 1 \
+  --vllm-mode "$VLLM_MODE" --vllm-server-host "$VLLM_HOST" --vllm-server-port "$VLLM_PORT" \
   --output-dir "$SMOKE_DIR"
 
 echo "== SMOKE: tiny eval =="
