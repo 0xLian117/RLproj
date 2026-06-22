@@ -4,16 +4,21 @@
 # TRL / vLLM / model issue surfaces in ~2 minutes instead of hours.
 #
 #   bash scripts/smoke_test.sh
+#   GPU=1 MODEL=/path/to/local/model bash scripts/smoke_test.sh
 set -euo pipefail
 cd "$(dirname "$0")/.."
 [ -d .venv ] && source .venv/bin/activate || true
 export PYTHONPATH="${PYTHONPATH:-.}"
+[ -n "${GPU:-}" ] && export CUDA_VISIBLE_DEVICES="$GPU"
+export HF_HUB_OFFLINE="${HF_HUB_OFFLINE:-1}"
+export TRANSFORMERS_OFFLINE="${TRANSFORMERS_OFFLINE:-1}"
 
 MODEL="${MODEL:-Qwen/Qwen2.5-1.5B-Instruct}"
 LORA_FLAG="${LORA_FLAG:-}"
-SMOKE_DIR="${SMOKE_DIR:-results/runs/_smoke}"
+RESULTS="${RESULTS_DIR:-results}"
+SMOKE_DIR="${SMOKE_DIR:-$RESULTS/runs/_smoke}"
 
-echo "== SMOKE: tiny GRPO train (model=$MODEL lora='${LORA_FLAG}') =="
+echo "== SMOKE: tiny GRPO train (gpu='${CUDA_VISIBLE_DEVICES:-all}' model=$MODEL lora='${LORA_FLAG}') =="
 python -m rlve.train \
   --condition smoke --controller stad --sampler lp $LORA_FLAG \
   --model "$MODEL" --max-steps 3 \
@@ -25,7 +30,7 @@ python -m rlve.train \
 echo "== SMOKE: tiny eval =="
 python -m rlve.evaluate \
   --model "$SMOKE_DIR" --tag _smoke \
-  --eval-set results/_smoke_eval_set.json --n-per 2 \
-  --max-tokens 128 --out-dir results/eval
+  --eval-set "$RESULTS/_smoke_eval_set.json" --n-per 2 \
+  --max-tokens 128 --out-dir "$RESULTS/eval"
 
 echo "== SMOKE PASSED: GPU training + eval pipeline works end-to-end =="

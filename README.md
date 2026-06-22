@@ -94,6 +94,28 @@ PROFILE=4090 bash scripts/run_all.sh
 # shorter / cheaper smoke of the science:
 MAX_STEPS=120 bash scripts/run_all.sh
 ```
+
+#### Local models (no download) + two GPUs
+`--model` accepts a **local path** as well as a HF id; local paths never
+download, and the run scripts export `HF_HUB_OFFLINE=1` by default (set
+`HF_HUB_OFFLINE=0` to allow Hub downloads). Pick a card with `GPU=<id>` and an
+output dir with `RESULTS_DIR=<dir>`:
+```bash
+GPU=0 MODEL=/path/to/local/Qwen-model RESULTS_DIR=results_x \
+  PROFILE=4090x48 bash scripts/run_all.sh
+```
+**Two GPUs (recommended way to use two cards):** run one model per card in
+parallel — each job is the fully-validated single-GPU path (no DDP), and you get
+a model-size comparison for the "scale to larger models" extension:
+```bash
+# GPU0 -> 4B (results_a/), GPU1 -> 0.5B-Instruct (results_b/)
+bash scripts/run_2gpu.sh
+# or override the paths:
+MODEL_A=/path/to/big MODEL_B=/path/to/small bash scripts/run_2gpu.sh
+```
+Tips for a bigger / reasoning model: if it emits long chain-of-thought, give it
+room with `MAX_COMPLETION_LEN=1280`; if it OOMs, lower `PROMPTS_PER_STEP=6` and
+`VLLM_MEM=0.25`.
 `run_all.sh` does, in order: CPU self-test → CPU simulation → **GPU smoke test
 (fails fast if the stack is broken)** → build eval set → eval base model →
 train+eval the 4 conditions → make figures + `results/REPORT.md` → package
