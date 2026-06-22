@@ -33,6 +33,9 @@ RESULTS="${RESULTS_DIR:-results}"
 VLLM_MODE="${VLLM_MODE:-colocate}"   # colocate | server
 VLLM_HOST="${VLLM_HOST:-0.0.0.0}"
 VLLM_PORT="${VLLM_PORT:-8000}"
+# NO_VLLM=1 -> never touch vLLM anywhere; use HuggingFace generate (robust,
+# slower; recommended when the vLLM/torch/driver stack won't cooperate).
+NOVLLM_FLAG=""; [ "${NO_VLLM:-0}" = "1" ] && NOVLLM_FLAG="--no-vllm"
 mkdir -p "$RESULTS/logs" "$RESULTS/runs" "$RESULTS/eval" "$RESULTS/sim"
 START=$(date +%s)
 echo "================ RLVE-lite run_all ================"
@@ -57,6 +60,7 @@ if [ "${SKIP_SMOKE:-0}" != "1" ]; then
   echo "### [2/6] GPU smoke test"
   MODEL="$MODEL" LORA_FLAG="$LORA_FLAG" RESULTS_DIR="$RESULTS" \
     VLLM_MODE="$VLLM_MODE" VLLM_HOST="$VLLM_HOST" VLLM_PORT="$VLLM_PORT" \
+    NO_VLLM="${NO_VLLM:-0}" \
     bash scripts/smoke_test.sh 2>&1 | tee "$RESULTS/logs/smoke.log"
   [ "${PIPESTATUS[0]}" -eq 0 ] || fatal "smoke test failed — fix before the full run"
 else
@@ -67,7 +71,7 @@ fi
 echo "### [3/6] build eval set + evaluate base model"
 python -m rlve.eval_set --out "$RESULTS/eval_set.json" --n-per "$EVAL_N_PER" \
   2>&1 | tee "$RESULTS/logs/eval_set.log"
-python -m rlve.evaluate --model "$MODEL" --tag base \
+python -m rlve.evaluate --model "$MODEL" --tag base $NOVLLM_FLAG \
   --eval-set "$RESULTS/eval_set.json" --n-per "$EVAL_N_PER" \
   --max-tokens "$MAX_COMPLETION_LEN" --out-dir "$RESULTS/eval" \
   2>&1 | tee "$RESULTS/logs/eval_base.log" || echo "WARN: base eval failed"
@@ -81,7 +85,7 @@ for spec in "${CONDITIONS[@]}"; do
   # shellcheck disable=SC2086
   if python -m rlve.train \
       --condition "$tag" --controller "$controller" --sampler "$sampler" \
-      $LORA_FLAG $extra \
+      $LORA_FLAG $extra $NOVLLM_FLAG \
       --model "$MODEL" --max-steps "$MAX_STEPS" \
       --num-generations "$NUM_GEN" --prompts-per-step "$PROMPTS_PER_STEP" \
       --max-prompt-length "$MAX_PROMPT_LEN" \
@@ -89,7 +93,7 @@ for spec in "${CONDITIONS[@]}"; do
       --vllm-gpu-mem "$VLLM_MEM" \
       --vllm-mode "$VLLM_MODE" --vllm-server-host "$VLLM_HOST" --vllm-server-port "$VLLM_PORT" \
       --output-dir "$RESULTS/runs/$tag" 2>&1 | tee "$RESULTS/logs/train_$tag.log"; then
-    if python -m rlve.evaluate --model "$RESULTS/runs/$tag" --tag "$tag" \
+    if python -m rlve.evaluate --model "$RESULTS/runs/$tag" --tag "$tag" $NOVLLM_FLAG \
         --eval-set "$RESULTS/eval_set.json" --n-per "$EVAL_N_PER" \
         --max-tokens "$MAX_COMPLETION_LEN" --out-dir "$RESULTS/eval" \
         2>&1 | tee "$RESULTS/logs/eval_$tag.log"; then

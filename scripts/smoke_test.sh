@@ -20,10 +20,11 @@ SMOKE_DIR="${SMOKE_DIR:-$RESULTS/runs/_smoke}"
 VLLM_MODE="${VLLM_MODE:-colocate}"
 VLLM_HOST="${VLLM_HOST:-0.0.0.0}"
 VLLM_PORT="${VLLM_PORT:-8000}"
+NOVLLM_FLAG=""; [ "${NO_VLLM:-0}" = "1" ] && NOVLLM_FLAG="--no-vllm"
 
-echo "== SMOKE: tiny GRPO train (gpu='${CUDA_VISIBLE_DEVICES:-all}' model=$MODEL lora='${LORA_FLAG}' vllm=$VLLM_MODE) =="
+echo "== SMOKE: tiny GRPO train (gpu='${CUDA_VISIBLE_DEVICES:-all}' model=$MODEL lora='${LORA_FLAG}' vllm=$VLLM_MODE no_vllm=${NO_VLLM:-0}) =="
 python -m rlve.train \
-  --condition smoke --controller stad --sampler lp $LORA_FLAG \
+  --condition smoke --controller stad --sampler lp $LORA_FLAG $NOVLLM_FLAG \
   --model "$MODEL" --max-steps 3 \
   --num-generations 4 --prompts-per-step 2 \
   --max-prompt-length 256 --max-completion-length 128 \
@@ -33,7 +34,7 @@ python -m rlve.train \
 
 echo "== SMOKE: tiny eval =="
 python -m rlve.evaluate \
-  --model "$SMOKE_DIR" --tag _smoke \
+  --model "$SMOKE_DIR" --tag _smoke $NOVLLM_FLAG \
   --eval-set "$RESULTS/_smoke_eval_set.json" --n-per 2 \
   --max-tokens 128 --out-dir "$RESULTS/eval"
 
