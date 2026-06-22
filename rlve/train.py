@@ -48,7 +48,9 @@ def parse_args():
     p.add_argument("--p-star", type=float, default=0.5)
     p.add_argument("--kp", type=float, default=1.5)
     p.add_argument("--tau-acc", type=float, default=0.9)
-    p.add_argument("--tau-num", type=int, default=64)
+    p.add_argument("--tau-num", type=int, default=0,
+                   help="min samples at the upper difficulty before a bump; "
+                        "0 => 8 * num_generations (the RLVE paper default)")
 
     # systems
     p.add_argument("--lora", action="store_true")
@@ -88,6 +90,8 @@ def filter_config_kwargs(GRPOConfig, kw):
 
 def main():
     args = parse_args()
+    if args.tau_num <= 0:                       # RLVE default: 8 x rollouts
+        args.tau_num = 8 * args.num_generations
     os.makedirs(args.output_dir, exist_ok=True)
 
     import torch
