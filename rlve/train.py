@@ -179,20 +179,27 @@ def main():
         curriculum, dataset, log_path=log_path,
         log_every=args.logging_steps, use_wandb=args.wandb))
 
-    # persist run config for reproducibility / eval
-    with open(os.path.join(args.output_dir, "run_config.json"), "w") as f:
-        json.dump({**vars(args), "use_vllm": use_vllm, "bf16": bf16,
-                   "per_device_train_batch_size": pdtbs}, f, indent=2)
+    is_main = trainer.accelerator.is_main_process
 
-    print(f"[train] condition={args.condition} controller={args.controller} "
-          f"sampler={args.sampler} model={args.model} vllm={use_vllm} "
-          f"lora={args.lora} steps={args.max_steps} pdtbs={pdtbs}", flush=True)
+    # persist run config for reproducibility / eval (main process only)
+    if is_main:
+        with open(os.path.join(args.output_dir, "run_config.json"), "w") as f:
+            json.dump({**vars(args), "use_vllm": use_vllm, "bf16": bf16,
+                       "per_device_train_batch_size": pdtbs,
+                       "world_size": trainer.accelerator.num_processes}, f, indent=2)
+        print(f"[train] condition={args.condition} controller={args.controller} "
+              f"sampler={args.sampler} model={args.model} vllm={use_vllm} "
+              f"lora={args.lora} steps={args.max_steps} pdtbs={pdtbs} "
+              f"world_size={trainer.accelerator.num_processes}", flush=True)
 
     trainer.train()
-    trainer.save_model(args.output_dir)
-    tok.save_pretrained(args.output_dir)
+    trainer.save_model(args.output_dir)            # distributed-safe (saves once)
+    if is_main:
+        tok.save_pretrained(args.output_dir)
 
-    # final summary
+    if not is_main:
+        return
+    # final summary (main process only)
     hist = curriculum.history
     tail = hist[-min(len(hist), 50):] if hist else []
     def _avg(key):

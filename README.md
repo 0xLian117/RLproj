@@ -171,8 +171,11 @@ tools/
 scripts/
   setup_remote.sh  env setup
   smoke_test.sh    ~2-min GPU pre-flight
-  run_all.sh       full experiment launcher
-configs/profiles.sh   hardware profiles (h200 / 4090) + experiment matrix
+  run_all.sh       full experiment launcher (single process)
+  run_2gpu.sh      two models, one per card, in parallel
+  run_4b_2gpu.sh   one model on two cards (vLLM server + trainer)
+  run_ddp.sh       distributed (DDP) training of one model across N GPUs
+configs/profiles.sh   hardware profiles (h200 / 4090x48 / 4090) + experiment matrix
 paper/PAPER_OUTLINE.md    NeurIPS-style write-up skeleton (with the math + protocol)
 poster/POSTER_OUTLINE.md  poster content
 ```
@@ -192,6 +195,15 @@ python tools/plot_results.py --results results
   generate (slower). You can also pass `--no-vllm`.
 - **TRL version drift:** `rlve/train.py` filters unknown `GRPOConfig` fields and
   prints which it dropped, so newer/older TRL still runs.
+- **vLLM won't import / `driver too old` / `'aimv2' already used`:** a vLLM↔torch↔
+  driver↔TRL version clash. Easiest: run with `NO_VLLM=1` (HF generate, no vLLM).
+  If you want vLLM, match it to your TRL's supported range (it prints the range)
+  AND to a CUDA your driver supports (`nvidia-smi` top-right; install a torch
+  whose `torch.version.cuda` ≤ that).
+- **Distributed training:** `bash scripts/run_ddp.sh` (DDP via `accelerate`,
+  defaults to `NO_VLLM=1`). Both cards train; rank 0 owns logging. Good for 4B/7B
+  with LoRA. Do a tiny `MAX_STEPS=20 EVAL_N_PER=4 ... bash scripts/run_ddp.sh`
+  first to validate before a long run.
 - **A condition crashes mid-run:** `run_all.sh` continues with the remaining
   conditions and reports which succeeded; rerun a single one with the matching
   `python -m rlve.train ...` line from `results/logs/train_<cond>.log`.

@@ -36,6 +36,10 @@ VLLM_PORT="${VLLM_PORT:-8000}"
 # NO_VLLM=1 -> never touch vLLM anywhere; use HuggingFace generate (robust,
 # slower; recommended when the vLLM/torch/driver stack won't cooperate).
 NOVLLM_FLAG=""; [ "${NO_VLLM:-0}" = "1" ] && NOVLLM_FLAG="--no-vllm"
+# How training is launched. Single-process by default; set to e.g.
+#   TRAIN_LAUNCHER="accelerate launch --num_processes 2 --multi_gpu rlve/train.py"
+# for distributed (DDP) training (see scripts/run_ddp.sh).
+TRAIN_LAUNCHER="${TRAIN_LAUNCHER:-python -m rlve.train}"
 mkdir -p "$RESULTS/logs" "$RESULTS/runs" "$RESULTS/eval" "$RESULTS/sim"
 START=$(date +%s)
 echo "================ RLVE-lite run_all ================"
@@ -83,7 +87,7 @@ for spec in "${CONDITIONS[@]}"; do
   IFS='|' read -r tag controller sampler extra <<< "$spec"
   echo "--- condition: $tag (controller=$controller sampler=$sampler $extra) ---"
   # shellcheck disable=SC2086
-  if python -m rlve.train \
+  if $TRAIN_LAUNCHER \
       --condition "$tag" --controller "$controller" --sampler "$sampler" \
       $LORA_FLAG $extra $NOVLLM_FLAG \
       --model "$MODEL" --max-steps "$MAX_STEPS" \

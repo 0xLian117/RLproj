@@ -39,8 +39,12 @@ class AdaptiveCallback(TrainerCallback):
         self.dataset.new_round()
 
     def on_step_end(self, args, state, control, **kwargs):
+        # Always update the local curriculum (each rank generates from its own
+        # controllers in DDP). Only rank 0 writes logs / prints to avoid races.
         metrics = self.curriculum.step_update()
         metrics["global_step"] = int(state.global_step)
+        if not state.is_world_process_zero:
+            return
         with open(self.log_path, "a") as f:
             f.write(json.dumps(metrics) + "\n")
         if self._wandb is not None:

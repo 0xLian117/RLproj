@@ -21,9 +21,10 @@ VLLM_MODE="${VLLM_MODE:-colocate}"
 VLLM_HOST="${VLLM_HOST:-0.0.0.0}"
 VLLM_PORT="${VLLM_PORT:-8000}"
 NOVLLM_FLAG=""; [ "${NO_VLLM:-0}" = "1" ] && NOVLLM_FLAG="--no-vllm"
+TRAIN_LAUNCHER="${TRAIN_LAUNCHER:-python -m rlve.train}"
 
 echo "== SMOKE: tiny GRPO train (gpu='${CUDA_VISIBLE_DEVICES:-all}' model=$MODEL lora='${LORA_FLAG}' vllm=$VLLM_MODE no_vllm=${NO_VLLM:-0}) =="
-python -m rlve.train \
+$TRAIN_LAUNCHER \
   --condition smoke --controller stad --sampler lp $LORA_FLAG $NOVLLM_FLAG \
   --model "$MODEL" --max-steps 3 \
   --num-generations 4 --prompts-per-step 2 \
