@@ -19,7 +19,7 @@
 # ============================================================================
 set -uo pipefail
 cd "$(dirname "$0")/.."
-[ -d .venv ] && source .venv/bin/activate || true
+[ -f .venv/bin/activate ] && source .venv/bin/activate || true
 export PYTHONPATH="${PYTHONPATH:-.}"
 export TOKENIZERS_PARALLELISM=false
 [ -n "${GPU:-}" ] && export CUDA_VISIBLE_DEVICES="$GPU"

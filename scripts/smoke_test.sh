@@ -7,7 +7,7 @@
 #   GPU=1 MODEL=/path/to/local/model bash scripts/smoke_test.sh
 set -euo pipefail
 cd "$(dirname "$0")/.."
-[ -d .venv ] && source .venv/bin/activate || true
+[ -f .venv/bin/activate ] && source .venv/bin/activate || true
 export PYTHONPATH="${PYTHONPATH:-.}"
 [ -n "${GPU:-}" ] && export CUDA_VISIBLE_DEVICES="$GPU"
 export HF_HUB_OFFLINE="${HF_HUB_OFFLINE:-1}"
