@@ -39,11 +39,17 @@ export WANDB_DIR=${WANDB_DIR:-/inspire/hdd/global_user/chenglian-253104020001/wa
 mkdir -p "$SAVE_ROOT" "$WANDB_DIR"
 
 MODELDIR=Nemotron-Research-Reasoning-Qwen-1.5B-v2
-RLVE_SH=scripts/training/${MODELDIR}/rlve.sh
+# 真实执行入口是 rlve/num-environment=X.sh;它里面自带 CKPT_ARGS/ROLLOUT_ARGS 等数组。
+RLVE_SH=scripts/training/${MODELDIR}/rlve/num-environment=${NUM_ENV}.sh
 [ -f "$RLVE_SH" ] || { echo "ERROR: 不在 RLVE 仓库根目录(缺 $RLVE_SH)"; exit 1; }
 
-# 每次从原始脚本开始改(幂等)
-[ -f "${RLVE_SH}.orig" ] || cp "$RLVE_SH" "${RLVE_SH}.orig"
+# 每次从 git 里的官方脚本刷新 .orig,避免曾经改坏的 .orig 被反复复用。
+if git ls-files --error-unmatch "$RLVE_SH" >/dev/null 2>&1; then
+  git restore "$RLVE_SH" 2>/dev/null || git checkout -- "$RLVE_SH"
+  cp "$RLVE_SH" "${RLVE_SH}.orig"
+elif [ ! -f "${RLVE_SH}.orig" ]; then
+  cp "$RLVE_SH" "${RLVE_SH}.orig"
+fi
 cp "${RLVE_SH}.orig" "$RLVE_SH"
 
 echo "== [1] 8 卡 → 单卡 + 缩小负载 =="
@@ -55,15 +61,16 @@ sed -i -E "s/--rollout-batch-size 128/--rollout-batch-size ${ROLLOUT_BSZ}/" "$RL
 sed -i -E "s/--n-samples-per-prompt 16/--n-samples-per-prompt ${N_SAMPLES}/" "$RLVE_SH"
 sed -i -E "s/--over-sampling-batch-size 384/--over-sampling-batch-size ${OVERSAMPLE}/" "$RLVE_SH"
 sed -i -E "s/--max-tokens-per-gpu 3072/--max-tokens-per-gpu ${MAX_TOK}/" "$RLVE_SH"
+sed -i -E "s/--sglang-mem-fraction-static 0\.[0-9]+/--sglang-mem-fraction-static ${SGLANG_MEM}/" "$RLVE_SH"
 # 时长控制:总步数 / 存档 / 评测间隔
 sed -i -E "s/--num-rollout 1000000/--num-rollout ${MAX_STEPS}/" "$RLVE_SH"
 sed -i -E "s/--save-interval 1/--save-interval ${SAVE_EVERY}/" "$RLVE_SH"
 sed -i -E "s/--eval-interval 20/--eval-interval ${EVAL_EVERY}/" "$RLVE_SH"
 
 echo "== [2] 指向你的模型 =="
-# 用 # 作分隔符,免去路径里 / 的转义;先换更长的 ref-load(_torch_dist),再换 hf-checkpoint
-sed -i -E "s#--ref-load \.\./${MODELDIR}_torch_dist#--ref-load ${MODEL_DIST}#" "$RLVE_SH"
-sed -i -E "s#--hf-checkpoint \.\./${MODELDIR}#--hf-checkpoint ${MODEL_HF}#" "$RLVE_SH"
+# 用 # 作分隔符,免去路径里 / 的转义。按参数名替换下一个 token,兼容原脚本是否加引号。
+sed -i -E "s#--ref-load[[:space:]]+\"?[^[:space:]\"\\\\]+\"?#--ref-load ${MODEL_DIST}#" "$RLVE_SH"
+sed -i -E "s#--hf-checkpoint[[:space:]]+\"?[^[:space:]\"\\\\]+\"?#--hf-checkpoint ${MODEL_HF}#" "$RLVE_SH"
 # --save / --load 改到大盘,且每个 ARM 独立目录(否则各臂写死同名目录→串档/resume 冲突)
 # SAVE_ROOT 与 ARM 在 run_arm.sh 里展开(烤成绝对路径),${RUN_NAME} 留给 rlve.sh 运行时展开
 sed -i "s#\.\./\${RUN_NAME}/#${SAVE_ROOT}/\${RUN_NAME}_${ARM}/#g" "$RLVE_SH"
@@ -84,9 +91,11 @@ if [ -n "$EXTRA" ]; then
   sed -i -E "s/^   --colocate \\\\$/   --colocate \\\\\n   ${EXTRA} \\\\/" "$RLVE_SH"
 fi
 
+bash -n "$RLVE_SH"
+
 echo "== 核对关键改动 =="
-grep -nE "num-gpus|actor-num-gpus-per-node|context-parallel-size|hf-checkpoint|ref-load|initial-difficulty|rollout-max-response-len|n-samples-per-prompt" "$RLVE_SH" | head -20
+grep -nE "num-gpus|actor-num-gpus-per-node|context-parallel-size|hf-checkpoint|ref-load|initial-difficulty|rollout-max-response-len|rollout-batch-size|n-samples-per-prompt|over-sampling-batch-size|max-tokens-per-gpu|sglang-mem-fraction-static" "$RLVE_SH"
 echo "ARM=$ARM  NUM_ENV=$NUM_ENV  DIFFICULTY_MODE=${DIFFICULTY_MODE:-<unset>}  STATIC_D=${STATIC_D}"
 
 echo "== 启动 num-environment=${NUM_ENV} =="
-bash "scripts/training/${MODELDIR}/rlve/num-environment=${NUM_ENV}.sh" "$WANDB_PROJECT"
+bash "$RLVE_SH" "$WANDB_PROJECT"

@@ -1,0 +1,294 @@
+:job_id:02000000
+Applying monkey patch to torch.distributed
+:actor_name:MegatronTrainRayActor
+[Gloo] Rank 0 is connected to 0 peer ranks. Expected number of connected peer ranks is : 0
+Set NUMA affinity for GPU 0
+[Gloo] Rank 0 is connected to 0 peer ranks. Expected number of connected peer ranks is : 0
+[Gloo] Rank 0 is connected to 0 peer ranks. Expected number of connected peer ranks is : 0
+[Gloo] Rank 0 is connected to 0 peer ranks. Expected number of connected peer ranks is : 0
+> setting random seeds to 1234 ...
+> building HuggingFaceTokenizer tokenizer ...
+ > number of parameters on (tensor, pipeline) model parallel rank (0, 0): 1777088000
+sharded_state_dict metadata loaded from the checkpoint: {'distrib_optim_sharding_type': 'fully_sharded_model_space', 'chained_optim_avoid_prefix': True, 'singleton_local_shards': False}
+ loading release distributed checkpoint from /inspire/hdd/global_user/chenglian-253104020001/models/Nemotron-Research-Reasoning-Qwen-1.5B-v2_torch_dist
+could not find arguments in the checkpoint ...
+ checkpoint version 3.0
+  successfully loaded checkpoint from /inspire/hdd/global_user/chenglian-253104020001/models/Nemotron-Research-Reasoning-Qwen-1.5B-v2_torch_dist [ t 1/1, p 1/1 ] at iteration 0
+Memory-Usage before offload model: {'gpu': '0', 'total_GB': 139.81, 'free_GB': 106.44, 'used_GB': 33.38}
+Memory-Usage after offload model: {'gpu': '0', 'total_GB': 139.81, 'free_GB': 136.71, 'used_GB': 3.1}
+[Gloo] Rank 0 is connected to 0 peer ranks. Expected number of connected peer ranks is : 0
+Memory-Usage before update_weights: {'gpu': '0', 'total_GB': 139.81, 'free_GB': 133.2, 'used_GB': 6.61}
+Memory-Usage after update_weights: {'gpu': '0', 'total_GB': 139.81, 'free_GB': 128.39, 'used_GB': 11.43}
+Memory-Usage before wake_up model: {'gpu': '0', 'total_GB': 139.81, 'free_GB': 136.11, 'used_GB': 3.7}
+Memory-Usage after wake_up model: {'gpu': '0', 'total_GB': 139.81, 'free_GB': 105.78, 'used_GB': 34.03}
+rollout 0: {'rollout/raw_reward': -0.46875, 'rollout/total_lengths': 2171.625, 'rollout/response_lengths': 2035.625, 'rollout/rewards': 1.862645149230957e-09, 'rollout/truncated': 0.875, 'rollout/rollout_log_probs': -1.1194794178009033, 'rollout/log_probs': -1.1202385425567627, 'rollout/advantages': 0.0, 'rollout/returns': 0.0}
+step 0: {'train/loss': 2.0965933799743652e-05, 'train/pg_loss': 2.0965933799743652e-05, 'train/entropy_loss': 1.1289948225021362, 'train/pg_clipfrac': 0.0, 'train/ppo_kl': 0.0, 'train/tis': 0.9999523758888245, 'train/ois': 1.0, 'train/tis_clipfrac': 0.0, 'train/grad_norm': 0.45214074212728705, 'train/lr-pg_0': 2e-06, 'train/lr-pg_1': 2e-06, 'train/step': 0}
+perf 0: {'perf/sleep_time': 12.215261936187744, 'perf/update_weights_time': 0.18589353561401367, 'perf/train_wait_time': 94.07613968849182, 'perf/wake_up_time': 1.250767469406128, 'perf/data_preprocess_time': 0.11309027671813965, 'perf/log_probs_time': 3.014589548110962, 'perf/actor_train_time': 6.792808532714844, 'perf/train_time': 10.024094820022583, 'perf/log_probs_tflops': 79.78232915360297, 'perf/actor_train_tflops': 106.22011842321558, 'perf/total_train_time': 104.1002345085144, 'perf/wait_time_ratio': 0.903707279168495}
+Memory-Usage before offload model: {'gpu': '0', 'total_GB': 139.81, 'free_GB': 103.02, 'used_GB': 36.79}
+Memory-Usage after offload model: {'gpu': '0', 'total_GB': 139.81, 'free_GB': 134.48, 'used_GB': 5.33}
+Memory-Usage before update_weights: {'gpu': '0', 'total_GB': 139.81, 'free_GB': 130.97, 'used_GB': 8.84}
+Memory-Usage after update_weights: {'gpu': '0', 'total_GB': 139.81, 'free_GB': 126.71, 'used_GB': 13.1}
+Memory-Usage before wake_up model: {'gpu': '0', 'total_GB': 139.81, 'free_GB': 134.46, 'used_GB': 5.35}
+Memory-Usage after wake_up model: {'gpu': '0', 'total_GB': 139.81, 'free_GB': 103.01, 'used_GB': 36.8}
+rollout 1: {'rollout/raw_reward': -0.1875, 'rollout/total_lengths': 1986.59375, 'rollout/response_lengths': 1900.34375, 'rollout/rewards': 0.0, 'rollout/truncated': 0.71875, 'rollout/rollout_log_probs': -0.9496241807937622, 'rollout/log_probs': -0.9503167867660522, 'rollout/advantages': 0.0, 'rollout/returns': 0.0}
+step 1: {'train/loss': 8.365698158740997e-05, 'train/pg_loss': 8.365698158740997e-05, 'train/entropy_loss': 0.9513622522354126, 'train/pg_clipfrac': 0.0, 'train/ppo_kl': 0.0, 'train/tis': 0.9999163150787354, 'train/ois': 1.0, 'train/tis_clipfrac': 0.0, 'train/grad_norm': 0.4235304916860293, 'train/lr-pg_0': 2e-06, 'train/lr-pg_1': 2e-06, 'train/step': 1}
+perf 1: {'perf/sleep_time': 1.6920514106750488, 'perf/update_weights_time': 0.1564645767211914, 'perf/train_wait_time': 19.13093638420105, 'perf/wake_up_time': 1.1891186237335205, 'perf/data_preprocess_time': 0.019846200942993164, 'perf/log_probs_time': 1.465092420578003, 'perf/actor_train_time': 4.652775049209595, 'perf/train_time': 6.2119786739349365, 'perf/log_probs_tflops': 149.2692398371933, 'perf/actor_train_tflops': 141.00825610389, 'perf/total_train_time': 25.342915058135986, 'perf/wait_time_ratio': 0.7548830251103782}
+Memory-Usage before offload model: {'gpu': '0', 'total_GB': 139.81, 'free_GB': 103.0, 'used_GB': 36.81}
+Memory-Usage after offload model: {'gpu': '0', 'total_GB': 139.81, 'free_GB': 134.46, 'used_GB': 5.35}
+Memory-Usage before update_weights: {'gpu': '0', 'total_GB': 139.81, 'free_GB': 130.95, 'used_GB': 8.86}
+Memory-Usage after update_weights: {'gpu': '0', 'total_GB': 139.81, 'free_GB': 126.69, 'used_GB': 13.12}
+Memory-Usage before wake_up model: {'gpu': '0', 'total_GB': 139.81, 'free_GB': 134.45, 'used_GB': 5.36}
+Memory-Usage after wake_up model: {'gpu': '0', 'total_GB': 139.81, 'free_GB': 102.99, 'used_GB': 36.82}
+rollout 2: {'rollout/raw_reward': -0.125, 'rollout/total_lengths': 1492.71875, 'rollout/response_lengths': 1422.09375, 'rollout/rewards': 0.0, 'rollout/truncated': 0.1875, 'rollout/rollout_log_probs': -0.8884245753288269, 'rollout/log_probs': -0.8889197707176208, 'rollout/advantages': 3.725290298461914e-09, 'rollout/returns': 3.725290298461914e-09}
+step 2: {'train/loss': 0.000334886834025383, 'train/pg_loss': 0.000334886834025383, 'train/entropy_loss': 0.8927120566368103, 'train/pg_clipfrac': 0.0, 'train/ppo_kl': 0.0, 'train/tis': 1.0001251697540283, 'train/ois': 1.0, 'train/tis_clipfrac': 0.0, 'train/grad_norm': 0.5937920103770992, 'train/lr-pg_0': 2e-06, 'train/lr-pg_1': 2e-06, 'train/step': 2}
+perf 2: {'perf/sleep_time': 1.2298040390014648, 'perf/update_weights_time': 0.3519561290740967, 'perf/train_wait_time': 17.866901636123657, 'perf/wake_up_time': 1.0221991539001465, 'perf/data_preprocess_time': 0.01559901237487793, 'perf/log_probs_time': 1.405517578125, 'perf/actor_train_time': 4.5353171825408936, 'perf/train_time': 6.030980348587036, 'perf/log_probs_tflops': 114.50130093282358, 'perf/actor_train_tflops': 106.45358507589646, 'perf/total_train_time': 23.897881984710693, 'perf/wait_time_ratio': 0.7476353614748991}
+Memory-Usage before offload model: {'gpu': '0', 'total_GB': 139.81, 'free_GB': 102.98, 'used_GB': 36.84}
+Memory-Usage after offload model: {'gpu': '0', 'total_GB': 139.81, 'free_GB': 134.45, 'used_GB': 5.36}
+Memory-Usage before update_weights: {'gpu': '0', 'total_GB': 139.81, 'free_GB': 130.94, 'used_GB': 8.87}
+Memory-Usage after update_weights: {'gpu': '0', 'total_GB': 139.81, 'free_GB': 126.63, 'used_GB': 13.18}
+Memory-Usage before wake_up model: {'gpu': '0', 'total_GB': 139.81, 'free_GB': 134.4, 'used_GB': 5.41}
+Memory-Usage after wake_up model: {'gpu': '0', 'total_GB': 139.81, 'free_GB': 102.92, 'used_GB': 36.89}
+rollout 3: {'rollout/raw_reward': -0.0625, 'rollout/total_lengths': 1739.8125, 'rollout/response_lengths': 1691.1875, 'rollout/rewards': 0.0, 'rollout/truncated': 0.34375, 'rollout/rollout_log_probs': -0.7760514616966248, 'rollout/log_probs': -0.776572048664093, 'rollout/advantages': 0.0, 'rollout/returns': 0.0}
+step 3: {'train/loss': 5.527772009372711e-05, 'train/pg_loss': 5.527772009372711e-05, 'train/entropy_loss': 0.7811105847358704, 'train/pg_clipfrac': 0.0, 'train/ppo_kl': 0.0, 'train/tis': 0.9999792575836182, 'train/ois': 1.0, 'train/tis_clipfrac': 0.0, 'train/grad_norm': 0.4267979827760344, 'train/lr-pg_0': 2e-06, 'train/lr-pg_1': 2e-06, 'train/step': 3}
+perf 3: {'perf/sleep_time': 1.4431383609771729, 'perf/update_weights_time': 0.17063069343566895, 'perf/train_wait_time': 18.538960933685303, 'perf/wake_up_time': 1.044851541519165, 'perf/data_preprocess_time': 0.021921873092651367, 'perf/log_probs_time': 1.3162486553192139, 'perf/actor_train_time': 4.4335243701934814, 'perf/train_time': 5.8443756103515625, 'perf/log_probs_tflops': 143.67947626422875, 'perf/actor_train_tflops': 127.96901627598821, 'perf/total_train_time': 24.383336544036865, 'perf/wait_time_ratio': 0.7603127201317799}
+Memory-Usage before offload model: {'gpu': '0', 'total_GB': 139.81, 'free_GB': 102.92, 'used_GB': 36.89}
+Memory-Usage after offload model: {'gpu': '0', 'total_GB': 139.81, 'free_GB': 134.4, 'used_GB': 5.41}
+Memory-Usage before update_weights: {'gpu': '0', 'total_GB': 139.81, 'free_GB': 130.89, 'used_GB': 8.92}
+Memory-Usage after update_weights: {'gpu': '0', 'total_GB': 139.81, 'free_GB': 126.56, 'used_GB': 13.25}
+Memory-Usage before wake_up model: {'gpu': '0', 'total_GB': 139.81, 'free_GB': 134.4, 'used_GB': 5.42}
+Memory-Usage after wake_up model: {'gpu': '0', 'total_GB': 139.81, 'free_GB': 102.92, 'used_GB': 36.9}
+rollout 4: {'rollout/raw_reward': 0.1875, 'rollout/total_lengths': 1508.46875, 'rollout/response_lengths': 1439.84375, 'rollout/rewards': 0.0, 'rollout/truncated': 0.125, 'rollout/rollout_log_probs': -0.9512166380882263, 'rollout/log_probs': -0.9515761733055115, 'rollout/advantages': 8.381903171539307e-09, 'rollout/returns': 8.381903171539307e-09}
+step 4: {'train/loss': -9.696558117866516e-05, 'train/pg_loss': -9.696558117866516e-05, 'train/entropy_loss': 0.9563983082771301, 'train/pg_clipfrac': 0.0, 'train/ppo_kl': 0.0, 'train/tis': 1.00027596950531, 'train/ois': 1.0, 'train/tis_clipfrac': 0.0, 'train/grad_norm': 0.572022135624696, 'train/lr-pg_0': 2e-06, 'train/lr-pg_1': 2e-06, 'train/step': 4}
+perf 4: {'perf/sleep_time': 1.4325599670410156, 'perf/update_weights_time': 0.17212462425231934, 'perf/train_wait_time': 24.789725303649902, 'perf/wake_up_time': 1.0341463088989258, 'perf/data_preprocess_time': 0.015523195266723633, 'perf/log_probs_time': 1.2823476791381836, 'perf/actor_train_time': 4.495637655258179, 'perf/train_time': 5.868252754211426, 'perf/log_probs_tflops': 126.7224995264775, 'perf/actor_train_tflops': 108.43999158092895, 'perf/total_train_time': 30.657978057861328, 'perf/wait_time_ratio': 0.8085897007579504}
+Memory-Usage before offload model: {'gpu': '0', 'total_GB': 139.81, 'free_GB': 102.92, 'used_GB': 36.9}
+Memory-Usage after offload model: {'gpu': '0', 'total_GB': 139.81, 'free_GB': 134.4, 'used_GB': 5.42}
+Memory-Usage before update_weights: {'gpu': '0', 'total_GB': 139.81, 'free_GB': 130.89, 'used_GB': 8.93}
+Memory-Usage after update_weights: {'gpu': '0', 'total_GB': 139.81, 'free_GB': 126.62, 'used_GB': 13.19}
+Memory-Usage before wake_up model: {'gpu': '0', 'total_GB': 139.81, 'free_GB': 134.39, 'used_GB': 5.42}
+Memory-Usage after wake_up model: {'gpu': '0', 'total_GB': 139.81, 'free_GB': 102.91, 'used_GB': 36.9}
+rollout 5: {'rollout/raw_reward': 0.0625, 'rollout/total_lengths': 1921.65625, 'rollout/response_lengths': 1871.15625, 'rollout/rewards': 0.0, 'rollout/truncated': 0.5625, 'rollout/rollout_log_probs': -0.7303439974784851, 'rollout/log_probs': -0.7308486104011536, 'rollout/advantages': 0.0, 'rollout/returns': 0.0}
+step 5: {'train/loss': -7.837451994419098e-05, 'train/pg_loss': -7.837451994419098e-05, 'train/entropy_loss': 0.7275587916374207, 'train/pg_clipfrac': 0.0, 'train/ppo_kl': 0.0, 'train/tis': 0.9999985098838806, 'train/ois': 1.0, 'train/tis_clipfrac': 0.0, 'train/grad_norm': 0.3629605097662558, 'train/lr-pg_0': 2e-06, 'train/lr-pg_1': 2e-06, 'train/step': 5}
+perf 5: {'perf/sleep_time': 1.1677093505859375, 'perf/update_weights_time': 0.24802660942077637, 'perf/train_wait_time': 26.08371663093567, 'perf/wake_up_time': 0.9899649620056152, 'perf/data_preprocess_time': 0.019344568252563477, 'perf/log_probs_time': 1.4897708892822266, 'perf/actor_train_time': 4.466396331787109, 'perf/train_time': 6.04816198348999, 'perf/log_probs_tflops': 141.39367503796547, 'perf/actor_train_tflops': 141.4859981195903, 'perf/total_train_time': 32.13187861442566, 'perf/wait_time_ratio': 0.811770669992054}
+Memory-Usage before offload model: {'gpu': '0', 'total_GB': 139.81, 'free_GB': 102.92, 'used_GB': 36.9}
+Memory-Usage after offload model: {'gpu': '0', 'total_GB': 139.81, 'free_GB': 134.39, 'used_GB': 5.42}
+Memory-Usage before update_weights: {'gpu': '0', 'total_GB': 139.81, 'free_GB': 130.88, 'used_GB': 8.93}
+Memory-Usage after update_weights: {'gpu': '0', 'total_GB': 139.81, 'free_GB': 126.62, 'used_GB': 13.19}
+Memory-Usage before wake_up model: {'gpu': '0', 'total_GB': 139.81, 'free_GB': 134.38, 'used_GB': 5.43}
+Memory-Usage after wake_up model: {'gpu': '0', 'total_GB': 139.81, 'free_GB': 102.9, 'used_GB': 36.91}
+rollout 6: {'rollout/raw_reward': -0.0625, 'rollout/total_lengths': 1990.75, 'rollout/response_lengths': 1939.75, 'rollout/rewards': 0.0, 'rollout/truncated': 0.78125, 'rollout/rollout_log_probs': -0.7729616165161133, 'rollout/log_probs': -0.773512601852417, 'rollout/advantages': -3.725290298461914e-09, 'rollout/returns': -3.725290298461914e-09}
+step 6: {'train/loss': -8.613243699073792e-05, 'train/pg_loss': -8.613243699073792e-05, 'train/entropy_loss': 0.775413990020752, 'train/pg_clipfrac': 0.0, 'train/ppo_kl': 0.0, 'train/tis': 0.9999613761901855, 'train/ois': 1.0, 'train/tis_clipfrac': 0.0, 'train/grad_norm': 0.3540182386982792, 'train/lr-pg_0': 2e-06, 'train/lr-pg_1': 2e-06, 'train/step': 6}
+perf 6: {'perf/sleep_time': 1.1828944683074951, 'perf/update_weights_time': 0.16441655158996582, 'perf/train_wait_time': 18.499608039855957, 'perf/wake_up_time': 1.025280237197876, 'perf/data_preprocess_time': 0.02119731903076172, 'perf/log_probs_time': 1.3170087337493896, 'perf/actor_train_time': 4.505518436431885, 'perf/train_time': 5.916736841201782, 'perf/log_probs_tflops': 166.19396583430245, 'perf/actor_train_tflops': 145.74054523694082, 'perf/total_train_time': 24.41634488105774, 'perf/wait_time_ratio': 0.7576731132352246}
+Memory-Usage before offload model: {'gpu': '0', 'total_GB': 139.81, 'free_GB': 102.91, 'used_GB': 36.91}
+Memory-Usage after offload model: {'gpu': '0', 'total_GB': 139.81, 'free_GB': 134.38, 'used_GB': 5.43}
+Memory-Usage before update_weights: {'gpu': '0', 'total_GB': 139.81, 'free_GB': 130.87, 'used_GB': 8.94}
+Memory-Usage after update_weights: {'gpu': '0', 'total_GB': 139.81, 'free_GB': 126.61, 'used_GB': 13.2}
+Memory-Usage before wake_up model: {'gpu': '0', 'total_GB': 139.81, 'free_GB': 134.37, 'used_GB': 5.44}
+Memory-Usage after wake_up model: {'gpu': '0', 'total_GB': 139.81, 'free_GB': 102.89, 'used_GB': 36.92}
+rollout 7: {'rollout/raw_reward': -0.15625, 'rollout/total_lengths': 1867.09375, 'rollout/response_lengths': 1818.71875, 'rollout/rewards': 1.862645149230957e-09, 'rollout/truncated': 0.59375, 'rollout/rollout_log_probs': -0.7798687815666199, 'rollout/log_probs': -0.7802985906600952, 'rollout/advantages': -9.313225746154785e-09, 'rollout/returns': -9.313225746154785e-09}
+step 7: {'train/loss': -2.7844682335853577e-05, 'train/pg_loss': -2.7844682335853577e-05, 'train/entropy_loss': 0.7781032919883728, 'train/pg_clipfrac': 0.0, 'train/ppo_kl': 0.0, 'train/tis': 1.0000816583633423, 'train/ois': 1.0, 'train/tis_clipfrac': 0.0, 'train/grad_norm': 0.4138636201396035, 'train/lr-pg_0': 2e-06, 'train/lr-pg_1': 2e-06, 'train/step': 7}
+perf 7: {'perf/sleep_time': 1.361647129058838, 'perf/update_weights_time': 0.26473236083984375, 'perf/train_wait_time': 22.519198417663574, 'perf/wake_up_time': 0.9850351810455322, 'perf/data_preprocess_time': 0.028885364532470703, 'perf/log_probs_time': 1.4207525253295898, 'perf/actor_train_time': 4.63349723815918, 'perf/train_time': 6.15597939491272, 'perf/log_probs_tflops': 143.90187283614887, 'perf/actor_train_tflops': 132.37233479792076, 'perf/total_train_time': 28.675177812576294, 'perf/wait_time_ratio': 0.7853202712412529}
+Memory-Usage before offload model: {'gpu': '0', 'total_GB': 139.81, 'free_GB': 102.9, 'used_GB': 36.92}
+Memory-Usage after offload model: {'gpu': '0', 'total_GB': 139.81, 'free_GB': 134.37, 'used_GB': 5.44}
+Memory-Usage before update_weights: {'gpu': '0', 'total_GB': 139.81, 'free_GB': 130.86, 'used_GB': 8.95}
+Memory-Usage after update_weights: {'gpu': '0', 'total_GB': 139.81, 'free_GB': 126.55, 'used_GB': 13.26}
+Memory-Usage before wake_up model: {'gpu': '0', 'total_GB': 139.81, 'free_GB': 134.31, 'used_GB': 5.51}
+Memory-Usage after wake_up model: {'gpu': '0', 'total_GB': 139.81, 'free_GB': 102.83, 'used_GB': 36.98}
+rollout 8: {'rollout/raw_reward': -0.0625, 'rollout/total_lengths': 1880.78125, 'rollout/response_lengths': 1815.78125, 'rollout/rewards': 0.0, 'rollout/truncated': 0.5, 'rollout/rollout_log_probs': -0.8024663329124451, 'rollout/log_probs': -0.8031085133552551, 'rollout/advantages': -9.313225746154785e-10, 'rollout/returns': -9.313225746154785e-10}
+step 8: {'train/loss': 1.329183578491211e-05, 'train/pg_loss': 1.329183578491211e-05, 'train/entropy_loss': 0.8072176575660706, 'train/pg_clipfrac': 0.0, 'train/ppo_kl': 0.0, 'train/tis': 0.9998841285705566, 'train/ois': 1.0, 'train/tis_clipfrac': 0.0, 'train/grad_norm': 0.424688546977321, 'train/lr-pg_0': 2e-06, 'train/lr-pg_1': 2e-06, 'train/step': 8}
+perf 8: {'perf/sleep_time': 1.3474657535552979, 'perf/update_weights_time': 0.2331383228302002, 'perf/train_wait_time': 18.074779987335205, 'perf/wake_up_time': 1.0860671997070312, 'perf/data_preprocess_time': 0.018807411193847656, 'perf/log_probs_time': 1.3548943996429443, 'perf/actor_train_time': 4.536212921142578, 'perf/train_time': 5.983245849609375, 'perf/log_probs_tflops': 151.86205636866106, 'perf/actor_train_tflops': 136.07631736144393, 'perf/total_train_time': 24.05802583694458, 'perf/wait_time_ratio': 0.7512993838247012}
+Memory-Usage before offload model: {'gpu': '0', 'total_GB': 139.81, 'free_GB': 102.83, 'used_GB': 36.98}
+Memory-Usage after offload model: {'gpu': '0', 'total_GB': 139.81, 'free_GB': 134.31, 'used_GB': 5.51}
+Memory-Usage before update_weights: {'gpu': '0', 'total_GB': 139.81, 'free_GB': 130.8, 'used_GB': 9.02}
+Memory-Usage after update_weights: {'gpu': '0', 'total_GB': 139.81, 'free_GB': 126.55, 'used_GB': 13.27}
+Memory-Usage before wake_up model: {'gpu': '0', 'total_GB': 139.81, 'free_GB': 134.28, 'used_GB': 5.53}
+Memory-Usage after wake_up model: {'gpu': '0', 'total_GB': 139.81, 'free_GB': 102.8, 'used_GB': 37.01}
+rollout 9: {'rollout/raw_reward': -0.0625, 'rollout/total_lengths': 1896.625, 'rollout/response_lengths': 1826.625, 'rollout/rewards': 3.725290298461914e-09, 'rollout/truncated': 0.5, 'rollout/rollout_log_probs': -0.8802604079246521, 'rollout/log_probs': -0.8810145854949951, 'rollout/advantages': 3.725290298461914e-09, 'rollout/returns': 3.725290298461914e-09}
+step 9: {'train/loss': -7.902272045612335e-05, 'train/pg_loss': -7.902272045612335e-05, 'train/entropy_loss': 0.8881046772003174, 'train/pg_clipfrac': 0.0, 'train/ppo_kl': 0.0, 'train/tis': 0.9999086856842041, 'train/ois': 1.0, 'train/tis_clipfrac': 0.0, 'train/grad_norm': 0.4053679390538477, 'train/lr-pg_0': 2e-06, 'train/lr-pg_1': 2e-06, 'train/step': 9}
+perf 9: {'perf/sleep_time': 1.0959103107452393, 'perf/update_weights_time': 0.15005850791931152, 'perf/train_wait_time': 14.345259428024292, 'perf/wake_up_time': 1.1264653205871582, 'perf/data_preprocess_time': 0.019045114517211914, 'perf/log_probs_time': 1.367842674255371, 'perf/actor_train_time': 4.44793701171875, 'perf/train_time': 5.907878875732422, 'perf/log_probs_tflops': 151.8648741155111, 'perf/actor_train_tflops': 140.1057984780322, 'perf/total_train_time': 20.253138303756714, 'perf/wait_time_ratio': 0.7082981023915399}
+Memory-Usage before offload model: {'gpu': '0', 'total_GB': 139.81, 'free_GB': 102.8, 'used_GB': 37.01}
+Memory-Usage after offload model: {'gpu': '0', 'total_GB': 139.81, 'free_GB': 134.28, 'used_GB': 5.53}
+Memory-Usage before update_weights: {'gpu': '0', 'total_GB': 139.81, 'free_GB': 130.77, 'used_GB': 9.04}
+Memory-Usage after update_weights: {'gpu': '0', 'total_GB': 139.81, 'free_GB': 126.52, 'used_GB': 13.29}
+Memory-Usage before wake_up model: {'gpu': '0', 'total_GB': 139.81, 'free_GB': 134.33, 'used_GB': 5.48}
+Memory-Usage after wake_up model: {'gpu': '0', 'total_GB': 139.81, 'free_GB': 102.85, 'used_GB': 36.96}
+rollout 10: {'rollout/raw_reward': -0.15625, 'rollout/total_lengths': 1946.9375, 'rollout/response_lengths': 1882.5625, 'rollout/rewards': 1.862645149230957e-09, 'rollout/truncated': 0.65625, 'rollout/rollout_log_probs': -0.8228979110717773, 'rollout/log_probs': -0.8236083984375, 'rollout/advantages': 0.0, 'rollout/returns': 0.0}
+step 10: {'train/loss': -9.480491280555725e-05, 'train/pg_loss': -9.480491280555725e-05, 'train/entropy_loss': 0.8268805742263794, 'train/pg_clipfrac': 0.0, 'train/ppo_kl': 0.0, 'train/tis': 0.9998273849487305, 'train/ois': 1.0, 'train/tis_clipfrac': 0.0, 'train/grad_norm': 0.4171875935815142, 'train/lr-pg_0': 2e-06, 'train/lr-pg_1': 2e-06, 'train/step': 10}
+perf 10: {'perf/sleep_time': 1.4230940341949463, 'perf/update_weights_time': 0.16727614402770996, 'perf/train_wait_time': 42.748223304748535, 'perf/wake_up_time': 1.2409331798553467, 'perf/data_preprocess_time': 0.02039504051208496, 'perf/log_probs_time': 1.3394355773925781, 'perf/actor_train_time': 4.56385064125061, 'perf/train_time': 5.9962990283966064, 'perf/log_probs_tflops': 159.6332110347846, 'perf/actor_train_tflops': 140.55131444977548, 'perf/total_train_time': 48.74452233314514, 'perf/wait_time_ratio': 0.8769851720483623}
+Memory-Usage before offload model: {'gpu': '0', 'total_GB': 139.81, 'free_GB': 102.85, 'used_GB': 36.96}
+Memory-Usage after offload model: {'gpu': '0', 'total_GB': 139.81, 'free_GB': 134.33, 'used_GB': 5.48}
+Memory-Usage before update_weights: {'gpu': '0', 'total_GB': 139.81, 'free_GB': 130.82, 'used_GB': 8.99}
+Memory-Usage after update_weights: {'gpu': '0', 'total_GB': 139.81, 'free_GB': 126.56, 'used_GB': 13.25}
+Memory-Usage before wake_up model: {'gpu': '0', 'total_GB': 139.81, 'free_GB': 134.33, 'used_GB': 5.48}
+Memory-Usage after wake_up model: {'gpu': '0', 'total_GB': 139.81, 'free_GB': 102.85, 'used_GB': 36.96}
+rollout 11: {'rollout/raw_reward': 0.125, 'rollout/total_lengths': 2038.21875, 'rollout/response_lengths': 1993.84375, 'rollout/rewards': 0.0, 'rollout/truncated': 0.65625, 'rollout/rollout_log_probs': -0.6865974068641663, 'rollout/log_probs': -0.6868305206298828, 'rollout/advantages': -9.313225746154785e-10, 'rollout/returns': -9.313225746154785e-10}
+step 11: {'train/loss': -2.9013492166996002e-05, 'train/pg_loss': -2.9013492166996002e-05, 'train/entropy_loss': 0.6827759146690369, 'train/pg_clipfrac': 0.0, 'train/ppo_kl': 0.0, 'train/tis': 1.0002118349075317, 'train/ois': 1.0, 'train/tis_clipfrac': 0.0, 'train/grad_norm': 0.3271507946328038, 'train/lr-pg_0': 2e-06, 'train/lr-pg_1': 2e-06, 'train/step': 11}
+perf 11: {'perf/sleep_time': 1.2075324058532715, 'perf/update_weights_time': 0.15462017059326172, 'perf/train_wait_time': 17.338070392608643, 'perf/wake_up_time': 1.023977518081665, 'perf/data_preprocess_time': 0.019932270050048828, 'perf/log_probs_time': 1.3616068363189697, 'perf/actor_train_time': 4.538390398025513, 'perf/train_time': 5.992732048034668, 'perf/log_probs_tflops': 164.7507075196217, 'perf/actor_train_tflops': 148.2854073625089, 'perf/total_train_time': 23.33080244064331, 'perf/wait_time_ratio': 0.7431407658060205}
+Memory-Usage before offload model: {'gpu': '0', 'total_GB': 139.81, 'free_GB': 102.86, 'used_GB': 36.95}
+Memory-Usage after offload model: {'gpu': '0', 'total_GB': 139.81, 'free_GB': 134.33, 'used_GB': 5.48}
+Memory-Usage before update_weights: {'gpu': '0', 'total_GB': 139.81, 'free_GB': 130.82, 'used_GB': 8.99}
+Memory-Usage after update_weights: {'gpu': '0', 'total_GB': 139.81, 'free_GB': 126.56, 'used_GB': 13.25}
+Memory-Usage before wake_up model: {'gpu': '0', 'total_GB': 139.81, 'free_GB': 134.28, 'used_GB': 5.54}
+Memory-Usage after wake_up model: {'gpu': '0', 'total_GB': 139.81, 'free_GB': 102.8, 'used_GB': 37.01}
+rollout 12: {'rollout/raw_reward': 0.28125, 'rollout/total_lengths': 2050.09375, 'rollout/response_lengths': 1985.21875, 'rollout/rewards': 1.862645149230957e-09, 'rollout/truncated': 0.75, 'rollout/rollout_log_probs': -0.8019129037857056, 'rollout/log_probs': -0.8024481534957886, 'rollout/advantages': -1.862645149230957e-09, 'rollout/returns': -1.862645149230957e-09}
+step 12: {'train/loss': 0.00012043491005897522, 'train/pg_loss': 0.00012043491005897522, 'train/entropy_loss': 0.8001736402511597, 'train/pg_clipfrac': 0.0, 'train/ppo_kl': 0.0, 'train/tis': 0.9999781847000122, 'train/ois': 1.0, 'train/tis_clipfrac': 0.0, 'train/grad_norm': 0.3515519458458102, 'train/lr-pg_0': 2e-06, 'train/lr-pg_1': 2e-06, 'train/step': 12}
+perf 12: {'perf/sleep_time': 1.7177255153656006, 'perf/update_weights_time': 0.15083837509155273, 'perf/train_wait_time': 25.708672761917114, 'perf/wake_up_time': 1.0065584182739258, 'perf/data_preprocess_time': 0.020207881927490234, 'perf/log_probs_time': 1.3446626663208008, 'perf/actor_train_time': 4.4670774936676025, 'perf/train_time': 5.905316352844238, 'perf/log_probs_tflops': 167.93912745714397, 'perf/actor_train_tflops': 151.6571910110558, 'perf/total_train_time': 31.613989114761353, 'perf/wait_time_ratio': 0.8132055928972627}
+Memory-Usage before offload model: {'gpu': '0', 'total_GB': 139.81, 'free_GB': 102.8, 'used_GB': 37.01}
+Memory-Usage after offload model: {'gpu': '0', 'total_GB': 139.81, 'free_GB': 134.28, 'used_GB': 5.54}
+Memory-Usage before update_weights: {'gpu': '0', 'total_GB': 139.81, 'free_GB': 130.77, 'used_GB': 9.05}
+Memory-Usage after update_weights: {'gpu': '0', 'total_GB': 139.81, 'free_GB': 126.52, 'used_GB': 13.3}
+Memory-Usage before wake_up model: {'gpu': '0', 'total_GB': 139.81, 'free_GB': 134.33, 'used_GB': 5.48}
+Memory-Usage after wake_up model: {'gpu': '0', 'total_GB': 139.81, 'free_GB': 102.85, 'used_GB': 36.96}
+rollout 13: {'rollout/raw_reward': -0.125, 'rollout/total_lengths': 2032.375, 'rollout/response_lengths': 1976.875, 'rollout/rewards': 3.725290298461914e-09, 'rollout/truncated': 0.75, 'rollout/rollout_log_probs': -0.7380185723304749, 'rollout/log_probs': -0.7384206056594849, 'rollout/advantages': 0.0, 'rollout/returns': 0.0}
+step 13: {'train/loss': -1.5305355191230774e-05, 'train/pg_loss': -1.5305355191230774e-05, 'train/entropy_loss': 0.7408865690231323, 'train/pg_clipfrac': 0.0, 'train/ppo_kl': 0.0, 'train/tis': 1.0000807046890259, 'train/ois': 1.0, 'train/tis_clipfrac': 0.0, 'train/grad_norm': 0.3456895685501295, 'train/lr-pg_0': 2e-06, 'train/lr-pg_1': 2e-06, 'train/step': 13}
+perf 13: {'perf/sleep_time': 1.2733352184295654, 'perf/update_weights_time': 0.15361571311950684, 'perf/train_wait_time': 25.75361180305481, 'perf/wake_up_time': 1.1842615604400635, 'perf/data_preprocess_time': 0.019848108291625977, 'perf/log_probs_time': 1.4000515937805176, 'perf/actor_train_time': 4.524003744125366, 'perf/train_time': 6.018664121627808, 'perf/log_probs_tflops': 159.76414817944303, 'perf/actor_train_tflops': 148.32749679622123, 'perf/total_train_time': 31.772275924682617, 'perf/wait_time_ratio': 0.8105686814537529}
+Memory-Usage before offload model: {'gpu': '0', 'total_GB': 139.81, 'free_GB': 102.86, 'used_GB': 36.96}
+Memory-Usage after offload model: {'gpu': '0', 'total_GB': 139.81, 'free_GB': 134.33, 'used_GB': 5.48}
+Memory-Usage before update_weights: {'gpu': '0', 'total_GB': 139.81, 'free_GB': 130.82, 'used_GB': 8.99}
+Memory-Usage after update_weights: {'gpu': '0', 'total_GB': 139.81, 'free_GB': 126.56, 'used_GB': 13.26}
+Memory-Usage before wake_up model: {'gpu': '0', 'total_GB': 139.81, 'free_GB': 134.28, 'used_GB': 5.53}
+Memory-Usage after wake_up model: {'gpu': '0', 'total_GB': 139.81, 'free_GB': 102.81, 'used_GB': 37.0}
+rollout 14: {'rollout/raw_reward': -0.09375, 'rollout/total_lengths': 2037.1875, 'rollout/response_lengths': 1964.5625, 'rollout/rewards': 1.862645149230957e-09, 'rollout/truncated': 0.65625, 'rollout/rollout_log_probs': -0.829088032245636, 'rollout/log_probs': -0.8295186758041382, 'rollout/advantages': 0.0, 'rollout/returns': 0.0}
+step 14: {'train/loss': 2.2159889340400696e-05, 'train/pg_loss': 2.2159889340400696e-05, 'train/entropy_loss': 0.8326849937438965, 'train/pg_clipfrac': 0.0, 'train/ppo_kl': 0.0, 'train/tis': 1.0001195669174194, 'train/ois': 1.0, 'train/tis_clipfrac': 0.0, 'train/grad_norm': 0.38521719831406526, 'train/lr-pg_0': 2e-06, 'train/lr-pg_1': 2e-06, 'train/step': 14}
+perf 14: {'perf/sleep_time': 1.2101259231567383, 'perf/update_weights_time': 0.18872857093811035, 'perf/train_wait_time': 23.104227304458618, 'perf/wake_up_time': 1.1099185943603516, 'perf/data_preprocess_time': 0.024125337600708008, 'perf/log_probs_time': 1.4269788265228271, 'perf/actor_train_time': 4.4795613288879395, 'perf/train_time': 6.003820180892944, 'perf/log_probs_tflops': 157.13892807294923, 'perf/actor_train_tflops': 150.1713494153178, 'perf/total_train_time': 29.108047485351562, 'perf/wait_time_ratio': 0.7937401955966188}
+Memory-Usage before offload model: {'gpu': '0', 'total_GB': 139.81, 'free_GB': 102.81, 'used_GB': 37.01}
+Memory-Usage after offload model: {'gpu': '0', 'total_GB': 139.81, 'free_GB': 134.28, 'used_GB': 5.53}
+Memory-Usage before update_weights: {'gpu': '0', 'total_GB': 139.81, 'free_GB': 130.77, 'used_GB': 9.04}
+Memory-Usage after update_weights: {'gpu': '0', 'total_GB': 139.81, 'free_GB': 126.46, 'used_GB': 13.35}
+Memory-Usage before wake_up model: {'gpu': '0', 'total_GB': 139.81, 'free_GB': 134.28, 'used_GB': 5.53}
+Memory-Usage after wake_up model: {'gpu': '0', 'total_GB': 139.81, 'free_GB': 102.81, 'used_GB': 37.0}
+rollout 15: {'rollout/raw_reward': -0.25, 'rollout/total_lengths': 2056.03125, 'rollout/response_lengths': 2022.90625, 'rollout/rewards': 0.0, 'rollout/truncated': 0.84375, 'rollout/rollout_log_probs': -0.6481934189796448, 'rollout/log_probs': -0.6487153172492981, 'rollout/advantages': 0.0, 'rollout/returns': 0.0}
+step 15: {'train/loss': -0.00010727532207965851, 'train/pg_loss': -0.00010727532207965851, 'train/entropy_loss': 0.6527695059776306, 'train/pg_clipfrac': 0.0, 'train/ppo_kl': 0.0, 'train/tis': 0.9999024271965027, 'train/ois': 1.0, 'train/tis_clipfrac': 0.0, 'train/grad_norm': 0.4227675427136278, 'train/lr-pg_0': 2e-06, 'train/lr-pg_1': 2e-06, 'train/step': 15}
+perf 15: {'perf/sleep_time': 1.3901402950286865, 'perf/update_weights_time': 0.16656756401062012, 'perf/train_wait_time': 40.615297079086304, 'perf/wake_up_time': 1.1755962371826172, 'perf/data_preprocess_time': 0.020264863967895508, 'perf/log_probs_time': 1.346017599105835, 'perf/actor_train_time': 4.548771858215332, 'perf/train_time': 5.9878880977630615, 'perf/log_probs_tflops': 168.2151718180298, 'perf/actor_train_tflops': 149.32860259506222, 'perf/total_train_time': 46.603185176849365, 'perf/wait_time_ratio': 0.8715133295065504}
+Memory-Usage before offload model: {'gpu': '0', 'total_GB': 139.81, 'free_GB': 102.81, 'used_GB': 37.0}
+Memory-Usage after offload model: {'gpu': '0', 'total_GB': 139.81, 'free_GB': 134.28, 'used_GB': 5.53}
+Memory-Usage before update_weights: {'gpu': '0', 'total_GB': 139.81, 'free_GB': 130.77, 'used_GB': 9.04}
+Memory-Usage after update_weights: {'gpu': '0', 'total_GB': 139.81, 'free_GB': 126.51, 'used_GB': 13.3}
+Memory-Usage before wake_up model: {'gpu': '0', 'total_GB': 139.81, 'free_GB': 134.27, 'used_GB': 5.54}
+Memory-Usage after wake_up model: {'gpu': '0', 'total_GB': 139.81, 'free_GB': 102.8, 'used_GB': 37.02}
+rollout 16: {'rollout/raw_reward': 0.125, 'rollout/total_lengths': 2075.78125, 'rollout/response_lengths': 2016.65625, 'rollout/rewards': 0.0, 'rollout/truncated': 0.8125, 'rollout/rollout_log_probs': -0.7809182405471802, 'rollout/log_probs': -0.7813546657562256, 'rollout/advantages': 0.0, 'rollout/returns': 0.0}
+step 16: {'train/loss': -9.034015238285065e-05, 'train/pg_loss': -9.034015238285065e-05, 'train/entropy_loss': 0.7742225527763367, 'train/pg_clipfrac': 0.0, 'train/ppo_kl': 0.0, 'train/tis': 1.0000602006912231, 'train/ois': 1.0, 'train/tis_clipfrac': 0.0, 'train/grad_norm': 0.34298654870705214, 'train/lr-pg_0': 2e-06, 'train/lr-pg_1': 2e-06, 'train/step': 16}
+perf 16: {'perf/sleep_time': 1.0825138092041016, 'perf/update_weights_time': 0.14170527458190918, 'perf/train_wait_time': 17.678189754486084, 'perf/wake_up_time': 1.1578266620635986, 'perf/data_preprocess_time': 0.020504236221313477, 'perf/log_probs_time': 1.3600566387176514, 'perf/actor_train_time': 4.518230438232422, 'perf/train_time': 5.971452236175537, 'perf/log_probs_tflops': 168.25314011624633, 'perf/actor_train_tflops': 151.94032486513512, 'perf/total_train_time': 23.64964199066162, 'perf/wait_time_ratio': 0.7475034827785788}
+Memory-Usage before offload model: {'gpu': '0', 'total_GB': 139.81, 'free_GB': 102.79, 'used_GB': 37.02}
+Memory-Usage after offload model: {'gpu': '0', 'total_GB': 139.81, 'free_GB': 134.27, 'used_GB': 5.54}
+Memory-Usage before update_weights: {'gpu': '0', 'total_GB': 139.81, 'free_GB': 130.76, 'used_GB': 9.05}
+Memory-Usage after update_weights: {'gpu': '0', 'total_GB': 139.81, 'free_GB': 126.44, 'used_GB': 13.37}
+Memory-Usage before wake_up model: {'gpu': '0', 'total_GB': 139.81, 'free_GB': 134.21, 'used_GB': 5.6}
+Memory-Usage after wake_up model: {'gpu': '0', 'total_GB': 139.81, 'free_GB': 102.73, 'used_GB': 37.08}
+rollout 17: {'rollout/raw_reward': -0.15625, 'rollout/total_lengths': 2057.96875, 'rollout/response_lengths': 1999.71875, 'rollout/rewards': 1.862645149230957e-09, 'rollout/truncated': 0.75, 'rollout/rollout_log_probs': -0.7880611419677734, 'rollout/log_probs': -0.788395881652832, 'rollout/advantages': -1.862645149230957e-09, 'rollout/returns': -1.862645149230957e-09}
+step 17: {'train/loss': -4.4051557779312134e-05, 'train/pg_loss': -4.4051557779312134e-05, 'train/entropy_loss': 0.7850565314292908, 'train/pg_clipfrac': 0.0, 'train/ppo_kl': 0.0, 'train/tis': 1.0001747608184814, 'train/ois': 1.0, 'train/tis_clipfrac': 0.0, 'train/grad_norm': 0.3663866562474438, 'train/lr-pg_0': 2e-06, 'train/lr-pg_1': 2e-06, 'train/step': 17}
+perf 17: {'perf/sleep_time': 1.1271185874938965, 'perf/update_weights_time': 0.1590585708618164, 'perf/train_wait_time': 24.381141662597656, 'perf/wake_up_time': 1.0702245235443115, 'perf/data_preprocess_time': 0.022623538970947266, 'perf/log_probs_time': 1.367485523223877, 'perf/actor_train_time': 4.452170372009277, 'perf/train_time': 5.915263891220093, 'perf/log_probs_tflops': 165.80928126350565, 'perf/actor_train_tflops': 152.7851179075639, 'perf/total_train_time': 30.29640555381775, 'perf/wait_time_ratio': 0.8047536074630249}
+Memory-Usage before offload model: {'gpu': '0', 'total_GB': 139.81, 'free_GB': 102.73, 'used_GB': 37.08}
+Memory-Usage after offload model: {'gpu': '0', 'total_GB': 139.81, 'free_GB': 134.21, 'used_GB': 5.6}
+Memory-Usage before update_weights: {'gpu': '0', 'total_GB': 139.81, 'free_GB': 130.7, 'used_GB': 9.11}
+Memory-Usage after update_weights: {'gpu': '0', 'total_GB': 139.81, 'free_GB': 126.44, 'used_GB': 13.38}
+Memory-Usage before wake_up model: {'gpu': '0', 'total_GB': 139.81, 'free_GB': 134.28, 'used_GB': 5.53}
+Memory-Usage after wake_up model: {'gpu': '0', 'total_GB': 139.81, 'free_GB': 102.8, 'used_GB': 37.01}
+rollout 18: {'rollout/raw_reward': 0.1875, 'rollout/total_lengths': 2021.78125, 'rollout/response_lengths': 1977.65625, 'rollout/rewards': 0.0, 'rollout/truncated': 0.6875, 'rollout/rollout_log_probs': -0.7129889726638794, 'rollout/log_probs': -0.7134106159210205, 'rollout/advantages': -2.7939677238464355e-09, 'rollout/returns': -2.7939677238464355e-09}
+step 18: {'train/loss': 0.0002972204238176346, 'train/pg_loss': 0.0002972204238176346, 'train/entropy_loss': 0.715101420879364, 'train/pg_clipfrac': 0.0, 'train/ppo_kl': 0.0, 'train/tis': 1.0000337362289429, 'train/ois': 1.0, 'train/tis_clipfrac': 0.0, 'train/grad_norm': 0.33292469542342545, 'train/lr-pg_0': 2e-06, 'train/lr-pg_1': 2e-06, 'train/step': 18}
+perf 18: {'perf/sleep_time': 1.0858204364776611, 'perf/update_weights_time': 0.2027878761291504, 'perf/train_wait_time': 21.271706581115723, 'perf/wake_up_time': 1.0684263706207275, 'perf/data_preprocess_time': 0.01946854591369629, 'perf/log_probs_time': 1.4197196960449219, 'perf/actor_train_time': 4.453369140625, 'perf/train_time': 5.966337442398071, 'perf/log_probs_tflops': 156.61990297339113, 'perf/actor_train_tflops': 149.7897573876585, 'perf/total_train_time': 27.238044023513794, 'perf/wait_time_ratio': 0.7809557309898056}
+Memory-Usage before offload model: {'gpu': '0', 'total_GB': 139.81, 'free_GB': 102.8, 'used_GB': 37.01}
+Memory-Usage after offload model: {'gpu': '0', 'total_GB': 139.81, 'free_GB': 134.28, 'used_GB': 5.53}
+Memory-Usage before update_weights: {'gpu': '0', 'total_GB': 139.81, 'free_GB': 130.77, 'used_GB': 9.04}
+Memory-Usage after update_weights: {'gpu': '0', 'total_GB': 139.81, 'free_GB': 126.51, 'used_GB': 13.31}
+Memory-Usage before wake_up model: {'gpu': '0', 'total_GB': 139.81, 'free_GB': 134.23, 'used_GB': 5.58}
+Memory-Usage after wake_up model: {'gpu': '0', 'total_GB': 139.81, 'free_GB': 102.76, 'used_GB': 37.06}
+rollout 19: {'rollout/raw_reward': -0.25, 'rollout/total_lengths': 2105.875, 'rollout/response_lengths': 2034.125, 'rollout/rewards': 0.0, 'rollout/truncated': 0.90625, 'rollout/rollout_log_probs': -0.8372868895530701, 'rollout/log_probs': -0.837834358215332, 'rollout/advantages': 0.0, 'rollout/returns': 0.0}
+step 19: {'train/loss': -5.715899169445038e-05, 'train/pg_loss': -5.715899169445038e-05, 'train/entropy_loss': 0.8386910557746887, 'train/pg_clipfrac': 0.0, 'train/ppo_kl': 0.0, 'train/tis': 0.9999929666519165, 'train/ois': 1.0, 'train/tis_clipfrac': 0.0, 'train/grad_norm': 0.3610418680736745, 'train/lr-pg_0': 2e-06, 'train/lr-pg_1': 2e-06, 'train/step': 19}
+perf 19: {'perf/sleep_time': 1.2760753631591797, 'perf/update_weights_time': 0.14571285247802734, 'perf/train_wait_time': 25.137905836105347, 'perf/wake_up_time': 1.0868463516235352, 'perf/data_preprocess_time': 0.02073979377746582, 'perf/log_probs_time': 1.3535289764404297, 'perf/actor_train_time': 4.502268075942993, 'perf/train_time': 5.950237274169922, 'perf/log_probs_tflops': 171.75373614745766, 'perf/actor_train_tflops': 154.9043647109774, 'perf/total_train_time': 31.08814311027527, 'perf/wait_time_ratio': 0.8086010716991571}
+Memory-Usage before offload model: {'gpu': '0', 'total_GB': 139.81, 'free_GB': 102.76, 'used_GB': 37.05}
+Memory-Usage after offload model: {'gpu': '0', 'total_GB': 139.81, 'free_GB': 134.23, 'used_GB': 5.58}
+Memory-Usage before update_weights: {'gpu': '0', 'total_GB': 139.81, 'free_GB': 130.72, 'used_GB': 9.09}
+Memory-Usage after update_weights: {'gpu': '0', 'total_GB': 139.81, 'free_GB': 126.41, 'used_GB': 13.4}
+Memory-Usage before wake_up model: {'gpu': '0', 'total_GB': 139.81, 'free_GB': 134.29, 'used_GB': 5.52}
+Memory-Usage after wake_up model: {'gpu': '0', 'total_GB': 139.81, 'free_GB': 102.81, 'used_GB': 37.0}
+rollout 20: {'rollout/raw_reward': 0.0, 'rollout/total_lengths': 2095.3125, 'rollout/response_lengths': 2023.6875, 'rollout/rewards': 3.725290298461914e-09, 'rollout/truncated': 0.8125, 'rollout/rollout_log_probs': -0.8119947910308838, 'rollout/log_probs': -0.8126069903373718, 'rollout/advantages': 3.725290298461914e-09, 'rollout/returns': 3.725290298461914e-09}
+step 20: {'train/loss': 0.00010388903319835663, 'train/pg_loss': 0.00010388903319835663, 'train/entropy_loss': 0.8123299479484558, 'train/pg_clipfrac': 0.0, 'train/ppo_kl': 0.0, 'train/tis': 0.9999247193336487, 'train/ois': 1.0, 'train/tis_clipfrac': 0.0, 'train/grad_norm': 0.36214149275050034, 'train/lr-pg_0': 2e-06, 'train/lr-pg_1': 2e-06, 'train/step': 20}
+perf 20: {'perf/sleep_time': 1.1095061302185059, 'perf/update_weights_time': 0.14464354515075684, 'perf/train_wait_time': 34.37758493423462, 'perf/wake_up_time': 1.0909745693206787, 'perf/data_preprocess_time': 0.021010160446166992, 'perf/log_probs_time': 1.3335020542144775, 'perf/actor_train_time': 4.503345012664795, 'perf/train_time': 5.931096792221069, 'perf/log_probs_tflops': 173.37987404351904, 'perf/actor_train_tflops': 154.02045649151964, 'perf/total_train_time': 40.30868172645569, 'perf/wait_time_ratio': 0.8528580807362814}
+Memory-Usage before offload model: {'gpu': '0', 'total_GB': 139.81, 'free_GB': 102.81, 'used_GB': 37.0}
+Memory-Usage after offload model: {'gpu': '0', 'total_GB': 139.81, 'free_GB': 134.29, 'used_GB': 5.52}
+Memory-Usage before update_weights: {'gpu': '0', 'total_GB': 139.81, 'free_GB': 130.78, 'used_GB': 9.03}
+Memory-Usage after update_weights: {'gpu': '0', 'total_GB': 139.81, 'free_GB': 126.52, 'used_GB': 13.3}
+Memory-Usage before wake_up model: {'gpu': '0', 'total_GB': 139.81, 'free_GB': 134.27, 'used_GB': 5.54}
+Memory-Usage after wake_up model: {'gpu': '0', 'total_GB': 139.81, 'free_GB': 102.8, 'used_GB': 37.01}
+rollout 21: {'rollout/raw_reward': -0.28125, 'rollout/total_lengths': 2076.90625, 'rollout/response_lengths': 2005.65625, 'rollout/rewards': 1.862645149230957e-09, 'rollout/truncated': 0.75, 'rollout/rollout_log_probs': -0.8222945928573608, 'rollout/log_probs': -0.8230993151664734, 'rollout/advantages': 1.862645149230957e-09, 'rollout/returns': 1.862645149230957e-09}
+step 21: {'train/loss': -4.9773603677749634e-05, 'train/pg_loss': -4.9773603677749634e-05, 'train/entropy_loss': 0.8241985440254211, 'train/pg_clipfrac': 0.0, 'train/ppo_kl': 0.0, 'train/tis': 0.9997278451919556, 'train/ois': 1.0, 'train/tis_clipfrac': 0.0, 'train/grad_norm': 0.3746725878321164, 'train/lr-pg_0': 2e-06, 'train/lr-pg_1': 2e-06, 'train/step': 21}
+perf 21: {'perf/sleep_time': 1.5705139636993408, 'perf/update_weights_time': 0.21905970573425293, 'perf/train_wait_time': 19.106295347213745, 'perf/wake_up_time': 1.0888116359710693, 'perf/data_preprocess_time': 0.01995253562927246, 'perf/log_probs_time': 1.4337046146392822, 'perf/actor_train_time': 4.49120306968689, 'perf/train_time': 6.0187952518463135, 'perf/log_probs_tflops': 159.70729543007943, 'perf/actor_train_tflops': 152.94771772519329, 'perf/total_train_time': 25.12509059906006, 'perf/wait_time_ratio': 0.7604468239381601}
+Memory-Usage before offload model: {'gpu': '0', 'total_GB': 139.81, 'free_GB': 102.8, 'used_GB': 37.01}
+Memory-Usage after offload model: {'gpu': '0', 'total_GB': 139.81, 'free_GB': 134.27, 'used_GB': 5.54}
+Memory-Usage before update_weights: {'gpu': '0', 'total_GB': 139.81, 'free_GB': 130.76, 'used_GB': 9.05}
+Memory-Usage after update_weights: {'gpu': '0', 'total_GB': 139.81, 'free_GB': 126.44, 'used_GB': 13.37}
+Memory-Usage before wake_up model: {'gpu': '0', 'total_GB': 139.81, 'free_GB': 134.18, 'used_GB': 5.63}
+Memory-Usage after wake_up model: {'gpu': '0', 'total_GB': 139.81, 'free_GB': 102.7, 'used_GB': 37.11}
+rollout 22: {'rollout/raw_reward': 0.0, 'rollout/total_lengths': 2059.25, 'rollout/response_lengths': 1999.875, 'rollout/rewards': 0.0, 'rollout/truncated': 0.78125, 'rollout/rollout_log_probs': -0.7535553574562073, 'rollout/log_probs': -0.7538177371025085, 'rollout/advantages': 1.862645149230957e-09, 'rollout/returns': 1.862645149230957e-09}
+step 22: {'train/loss': 3.6084093153476715e-05, 'train/pg_loss': 3.6084093153476715e-05, 'train/entropy_loss': 0.7478654980659485, 'train/pg_clipfrac': 0.0, 'train/ppo_kl': 0.0, 'train/tis': 1.0002286434173584, 'train/ois': 1.0, 'train/tis_clipfrac': 0.0, 'train/grad_norm': 0.33848581097839775, 'train/lr-pg_0': 2e-06, 'train/lr-pg_1': 2e-06, 'train/step': 22}
+perf 22: {'perf/sleep_time': 1.5390043258666992, 'perf/update_weights_time': 0.25287294387817383, 'perf/train_wait_time': 37.88957905769348, 'perf/wake_up_time': 1.1581099033355713, 'perf/data_preprocess_time': 0.021651506423950195, 'perf/log_probs_time': 1.3687121868133545, 'perf/actor_train_time': 4.4764673709869385, 'perf/train_time': 5.9409215450286865, 'perf/log_probs_tflops': 165.74092821551739, 'perf/actor_train_tflops': 152.02945280420178, 'perf/total_train_time': 43.83050060272217, 'perf/wait_time_ratio': 0.8644569086975084}
+Memory-Usage before offload model: {'gpu': '0', 'total_GB': 139.81, 'free_GB': 102.7, 'used_GB': 37.11}
+Memory-Usage after offload model: {'gpu': '0', 'total_GB': 139.81, 'free_GB': 134.18, 'used_GB': 5.63}
+Memory-Usage before update_weights: {'gpu': '0', 'total_GB': 139.81, 'free_GB': 130.67, 'used_GB': 9.14}
+Memory-Usage after update_weights: {'gpu': '0', 'total_GB': 139.81, 'free_GB': 126.36, 'used_GB': 13.46}
+Memory-Usage before wake_up model: {'gpu': '0', 'total_GB': 139.81, 'free_GB': 134.21, 'used_GB': 5.6}
+Memory-Usage after wake_up model: {'gpu': '0', 'total_GB': 139.81, 'free_GB': 102.73, 'used_GB': 37.08}
+rollout 23: {'rollout/raw_reward': 0.125, 'rollout/total_lengths': 2021.625, 'rollout/response_lengths': 1984.125, 'rollout/rewards': 0.0, 'rollout/truncated': 0.75, 'rollout/rollout_log_probs': -0.6329897046089172, 'rollout/log_probs': -0.633544921875, 'rollout/advantages': 0.0, 'rollout/returns': 0.0}
+step 23: {'train/loss': -0.0002869255840778351, 'train/pg_loss': -0.0002869255840778351, 'train/entropy_loss': 0.6365053653717041, 'train/pg_clipfrac': 0.0, 'train/ppo_kl': 0.0, 'train/tis': 0.9998568296432495, 'train/ois': 1.0, 'train/tis_clipfrac': 0.0, 'train/grad_norm': 0.3045681450671163, 'train/lr-pg_0': 2e-06, 'train/lr-pg_1': 2e-06, 'train/step': 23}
+perf 23: {'perf/sleep_time': 1.4350361824035645, 'perf/update_weights_time': 0.1848905086517334, 'perf/train_wait_time': 10.355436325073242, 'perf/wake_up_time': 1.054649829864502, 'perf/data_preprocess_time': 0.0201871395111084, 'perf/log_probs_time': 1.3729639053344727, 'perf/actor_train_time': 4.686126232147217, 'perf/train_time': 6.155736207962036, 'perf/log_probs_tflops': 161.92024832390777, 'perf/actor_train_tflops': 142.32053009996852, 'perf/total_train_time': 16.51117253303528, 'perf/wait_time_ratio': 0.627177525057912}
+Memory-Usage before offload model: {'gpu': '0', 'total_GB': 139.81, 'free_GB': 102.73, 'used_GB': 37.08}
+Memory-Usage after offload model: {'gpu': '0', 'total_GB': 139.81, 'free_GB': 134.21, 'used_GB': 5.6}
+Memory-Usage before update_weights: {'gpu': '0', 'total_GB': 139.81, 'free_GB': 130.7, 'used_GB': 9.11}
+Memory-Usage after update_weights: {'gpu': '0', 'total_GB': 139.81, 'free_GB': 126.44, 'used_GB': 13.37}
+Memory-Usage before wake_up model: {'gpu': '0', 'total_GB': 139.81, 'free_GB': 134.21, 'used_GB': 5.6}
+Memory-Usage after wake_up model: {'gpu': '0', 'total_GB': 139.81, 'free_GB': 102.73, 'used_GB': 37.08}
+rollout 24: {'rollout/raw_reward': -0.3125, 'rollout/total_lengths': 2080.09375, 'rollout/response_lengths': 2020.34375, 'rollout/rewards': 0.0, 'rollout/truncated': 0.90625, 'rollout/rollout_log_probs': -0.7496681809425354, 'rollout/log_probs': -0.7502052783966064, 'rollout/advantages': -3.725290298461914e-09, 'rollout/returns': -3.725290298461914e-09}
+step 24: {'train/loss': 4.209205508232117e-05, 'train/pg_loss': 4.209205508232117e-05, 'train/entropy_loss': 0.750182032585144, 'train/pg_clipfrac': 0.0, 'train/ppo_kl': 0.0, 'train/tis': 0.999948263168335, 'train/ois': 1.0, 'train/tis_clipfrac': 0.0, 'train/grad_norm': 0.3439231566485456, 'train/lr-pg_0': 2e-06, 'train/lr-pg_1': 2e-06, 'train/step': 24}
+perf 24: {'perf/sleep_time': 1.305617332458496, 'perf/update_weights_time': 0.17863988876342773, 'perf/train_wait_time': 15.245603084564209, 'perf/wake_up_time': 1.1697633266448975, 'perf/data_preprocess_time': 0.020870447158813477, 'perf/log_probs_time': 1.3628299236297607, 'perf/actor_train_time': 4.501793146133423, 'perf/train_time': 5.95962381362915, 'perf/log_probs_tflops': 168.31008020305475, 'perf/actor_train_tflops': 152.85776554144437, 'perf/total_train_time': 21.20522689819336, 'perf/wait_time_ratio': 0.7189549613290439}
+Memory-Usage before offload model: {'gpu': '0', 'total_GB': 139.81, 'free_GB': 102.74, 'used_GB': 37.08}
+Memory-Usage after offload model: {'gpu': '0', 'total_GB': 139.81, 'free_GB': 134.21, 'used_GB': 5.6}
+Memory-Usage before update_weights: {'gpu': '0', 'total_GB': 139.81, 'free_GB': 130.7, 'used_GB': 9.11}
+Memory-Usage after update_weights: {'gpu': '0', 'total_GB': 139.81, 'free_GB': 126.44, 'used_GB': 13.37}
+Memory-Usage before wake_up model: {'gpu': '0', 'total_GB': 139.81, 'free_GB': 134.19, 'used_GB': 5.63}
+Memory-Usage after wake_up model: {'gpu': '0', 'total_GB': 139.81, 'free_GB': 102.71, 'used_GB': 37.1}
+rollout 25: {'rollout/raw_reward': 0.1875, 'rollout/total_lengths': 2022.21875, 'rollout/response_lengths': 1969.21875, 'rollout/rewards': 0.0, 'rollout/truncated': 0.8125, 'rollout/rollout_log_probs': -0.686904788017273, 'rollout/log_probs': -0.6873656511306763, 'rollout/advantages': 0.0, 'rollout/returns': 0.0}
+step 25: {'train/loss': -0.00013099610805511475, 'train/pg_loss': -0.00013099610805511475, 'train/entropy_loss': 0.6892080307006836, 'train/pg_clipfrac': 0.0, 'train/ppo_kl': 0.0, 'train/tis': 1.0000056028366089, 'train/ois': 1.0, 'train/tis_clipfrac': 0.0, 'train/grad_norm': 0.3364355808375522, 'train/lr-pg_0': 2e-06, 'train/lr-pg_1': 2e-06, 'train/step': 25}
+perf 25: {'perf/sleep_time': 1.1004414558410645, 'perf/update_weights_time': 0.17405223846435547, 'perf/train_wait_time': 14.580048322677612, 'perf/wake_up_time': 1.1122820377349854, 'perf/data_preprocess_time': 0.0198516845703125, 'perf/log_probs_time': 1.3726458549499512, 'perf/actor_train_time': 4.582135200500488, 'perf/train_time': 6.0472283363342285, 'perf/log_probs_tflops': 162.07666220214955, 'perf/actor_train_tflops': 145.65732927191067, 'perf/total_train_time': 20.62727665901184, 'perf/wait_time_ratio': 0.706833411104114}
+Memory-Usage before offload model: {'gpu': '0', 'total_GB': 139.81, 'free_GB': 102.71, 'used_GB': 37.1}
+Memory-Usage after offload model: {'gpu': '0', 'total_GB': 139.81, 'free_GB': 134.19, 'used_GB': 5.63}
+Memory-Usage before update_weights: {'gpu': '0', 'total_GB': 139.81, 'free_GB': 130.68, 'used_GB': 9.14}
+Memory-Usage after update_weights: {'gpu': '0', 'total_GB': 139.81, 'free_GB': 126.41, 'used_GB': 13.4}
+Memory-Usage before wake_up model: {'gpu': '0', 'total_GB': 139.81, 'free_GB': 134.14, 'used_GB': 5.67}
+Memory-Usage after wake_up model: {'gpu': '0', 'total_GB': 139.81, 'free_GB': 102.67, 'used_GB': 37.15}
+rollout 26: {'rollout/raw_reward': 0.09375, 'rollout/total_lengths': 1997.21875, 'rollout/response_lengths': 1912.59375, 'rollout/rewards': -1.862645149230957e-09, 'rollout/truncated': 0.625, 'rollout/rollout_log_probs': -0.9104412198066711, 'rollout/log_probs': -0.9109410047531128, 'rollout/advantages': -4.6566128730773926e-09, 'rollout/returns': -4.6566128730773926e-09}
+step 26: {'train/loss': -5.455687642097473e-05, 'train/pg_loss': -5.455687642097473e-05, 'train/entropy_loss': 0.9111804366111755, 'train/pg_clipfrac': 0.0, 'train/ppo_kl': 0.0, 'train/tis': 1.0000916719436646, 'train/ois': 1.0, 'train/tis_clipfrac': 0.0, 'train/grad_norm': 0.4272351944759322, 'train/lr-pg_0': 2e-06, 'train/lr-pg_1': 2e-06, 'train/step': 26}
+perf 26: {'perf/sleep_time': 1.2556986808776855, 'perf/update_weights_time': 0.21220183372497559, 'perf/train_wait_time': 24.510318517684937, 'perf/wake_up_time': 1.1102116107940674, 'perf/data_preprocess_time': 0.019388437271118164, 'perf/log_probs_time': 1.3597691059112549, 'perf/actor_train_time': 4.501497507095337, 'perf/train_time': 5.954892158508301, 'perf/log_probs_tflops': 161.4310597935575, 'perf/actor_train_tflops': 146.2906293933063, 'perf/total_train_time': 30.465210676193237, 'perf/wait_time_ratio': 0.804534679841827}
+Memory-Usage before offload model: {'gpu': '0', 'total_GB': 139.81, 'free_GB': 102.67, 'used_GB': 37.15}
+Memory-Usage after offload model: {'gpu': '0', 'total_GB': 139.81, 'free_GB': 134.14, 'used_GB': 5.67}
+Memory-Usage before update_weights: {'gpu': '0', 'total_GB': 139.81, 'free_GB': 130.63, 'used_GB': 9.18}
+Memory-Usage after update_weights: {'gpu': '0', 'total_GB': 139.81, 'free_GB': 126.31, 'used_GB': 13.51}
+Memory-Usage before wake_up model: {'gpu': '0', 'total_GB': 139.81, 'free_GB': 134.08, 'used_GB': 5.73}
+Memory-Usage after wake_up model: {'gpu': '0', 'total_GB': 139.81, 'free_GB': 102.6, 'used_GB': 37.21}
+rollout 27: {'rollout/raw_reward': 0.1875, 'rollout/total_lengths': 2015.46875, 'rollout/response_lengths': 1972.59375, 'rollout/rewards': 0.0, 'rollout/truncated': 0.625, 'rollout/rollout_log_probs': -0.6531142592430115, 'rollout/log_probs': -0.6535017490386963, 'rollout/advantages': -7.450580596923828e-09, 'rollout/returns': -7.450580596923828e-09}
+step 27: {'train/loss': -0.00010747089982032776, 'train/pg_loss': -0.00010747089982032776, 'train/entropy_loss': 0.6542692184448242, 'train/pg_clipfrac': 0.0, 'train/ppo_kl': 0.0, 'train/tis': 1.0000330209732056, 'train/ois': 1.0, 'train/tis_clipfrac': 0.0, 'train/grad_norm': 0.3051431501109148, 'train/lr-pg_0': 2e-06, 'train/lr-pg_1': 2e-06, 'train/step': 27}
+perf 27: {'perf/sleep_time': 1.185762882232666, 'perf/update_weights_time': 0.16854381561279297, 'perf/train_wait_time': 29.95063281059265, 'perf/wake_up_time': 1.199646234512329, 'perf/data_preprocess_time': 0.019504547119140625, 'perf/log_probs_time': 1.334731101989746, 'perf/actor_train_time': 4.474218368530273, 'perf/train_time': 5.901911735534668, 'perf/log_probs_tflops': 166.00919312181145, 'perf/actor_train_tflops': 148.56961486349374, 'perf/total_train_time': 35.85254454612732, 'perf/wait_time_ratio': 0.835383741649317}
+Memory-Usage before offload model: {'gpu': '0', 'total_GB': 139.81, 'free_GB': 102.6, 'used_GB': 37.21}
+Memory-Usage after offload model: {'gpu': '0', 'total_GB': 139.81, 'free_GB': 134.08, 'used_GB': 5.73}
+Memory-Usage before update_weights: {'gpu': '0', 'total_GB': 139.81, 'free_GB': 130.57, 'used_GB': 9.24}
+Memory-Usage after update_weights: {'gpu': '0', 'total_GB': 139.81, 'free_GB': 126.31, 'used_GB': 13.51}
+Memory-Usage before wake_up model: {'gpu': '0', 'total_GB': 139.81, 'free_GB': 134.08, 'used_GB': 5.73}
+Memory-Usage after wake_up model: {'gpu': '0', 'total_GB': 139.81, 'free_GB': 102.6, 'used_GB': 37.21}
+rollout 28: {'rollout/raw_reward': -0.1875, 'rollout/total_lengths': 2064.15625, 'rollout/response_lengths': 2004.28125, 'rollout/rewards': 0.0, 'rollout/truncated': 0.8125, 'rollout/rollout_log_probs': -0.8209453225135803, 'rollout/log_probs': -0.8213103413581848, 'rollout/advantages': -3.725290298461914e-09, 'rollout/returns': -3.725290298461914e-09}
+step 28: {'train/loss': 0.00012044794857501984, 'train/pg_loss': 0.00012044794857501984, 'train/entropy_loss': 0.8181715607643127, 'train/pg_clipfrac': 0.0, 'train/ppo_kl': 0.0, 'train/tis': 1.0001447200775146, 'train/ois': 1.0, 'train/tis_clipfrac': 0.0, 'train/grad_norm': 0.3536651042393775, 'train/lr-pg_0': 2e-06, 'train/lr-pg_1': 2e-06, 'train/step': 28}
+perf 28: {'perf/sleep_time': 1.1234691143035889, 'perf/update_weights_time': 0.1454143524169922, 'perf/train_wait_time': 25.795538663864136, 'perf/wake_up_time': 1.039015531539917, 'perf/data_preprocess_time': 0.020512104034423828, 'perf/log_probs_time': 1.4036340713500977, 'perf/actor_train_time': 4.9503843784332275, 'perf/train_time': 6.4477550983428955, 'perf/log_probs_tflops': 162.0292253273538, 'perf/actor_train_tflops': 137.82550434755316, 'perf/total_train_time': 32.24329376220703, 'perf/wait_time_ratio': 0.8000280261100239}
+Memory-Usage before offload model: {'gpu': '0', 'total_GB': 139.81, 'free_GB': 102.6, 'used_GB': 37.21}
+Memory-Usage after offload model: {'gpu': '0', 'total_GB': 139.81, 'free_GB': 134.08, 'used_GB': 5.73}
+Memory-Usage before update_weights: {'gpu': '0', 'total_GB': 139.81, 'free_GB': 130.57, 'used_GB': 9.24}
+Memory-Usage after update_weights: {'gpu': '0', 'total_GB': 139.81, 'free_GB': 126.31, 'used_GB': 13.51}
+Memory-Usage before wake_up model: {'gpu': '0', 'total_GB': 139.81, 'free_GB': 134.08, 'used_GB': 5.74}
+Memory-Usage after wake_up model: {'gpu': '0', 'total_GB': 139.81, 'free_GB': 102.6, 'used_GB': 37.21}
+rollout 29: {'rollout/raw_reward': 0.03125, 'rollout/total_lengths': 1998.625, 'rollout/response_lengths': 1913.0, 'rollout/rewards': -1.862645149230957e-09, 'rollout/truncated': 0.6875, 'rollout/rollout_log_probs': -0.8949071764945984, 'rollout/log_probs': -0.8956806659698486, 'rollout/advantages': -3.725290298461914e-09, 'rollout/returns': -3.725290298461914e-09}
+step 29: {'train/loss': 6.53369352221489e-05, 'train/pg_loss': 6.53369352221489e-05, 'train/entropy_loss': 0.8946179151535034, 'train/pg_clipfrac': 0.0, 'train/ppo_kl': 0.0, 'train/tis': 0.9998151063919067, 'train/ois': 1.0, 'train/tis_clipfrac': 0.0, 'train/grad_norm': 0.3823421858929754, 'train/lr-pg_0': 2e-06, 'train/lr-pg_1': 2e-06, 'train/step': 29}
+perf 29: {'perf/sleep_time': 1.158139944076538, 'perf/update_weights_time': 0.16193652153015137, 'perf/train_wait_time': 32.00228929519653, 'perf/wake_up_time': 1.4322760105133057, 'perf/data_preprocess_time': 0.019646167755126953, 'perf/log_probs_time': 1.3348042964935303, 'perf/actor_train_time': 4.490489482879639, 'perf/train_time': 5.918100357055664, 'perf/log_probs_tflops': 164.6727921982602, 'perf/actor_train_tflops': 146.84765528113513, 'perf/total_train_time': 37.9203896522522, 'perf/wait_time_ratio': 0.8439335562918149}
+saving checkpoint at iteration      29 to /inspire/hdd/global_user/chenglian-253104020001/rlve_ckpts/[Nemotron-Research-Reasoning-Qwen-1.5B-v2]_[num-environment=4]_fep/ in torch_dist format
+Storing distributed optimizer sharded state of type fully_sharded_model_space
+  successfully saved checkpoint from iteration      29 to /inspire/hdd/global_user/chenglian-253104020001/rlve_ckpts/[Nemotron-Research-Reasoning-Qwen-1.5B-v2]_[num-environment=4]_fep/ [ t 1/1, p 1/1 ]
+Memory-Usage before offload model: {'gpu': '0', 'total_GB': 139.81, 'free_GB': 102.54, 'used_GB': 37.27}
+Memory-Usage after offload model: {'gpu': '0', 'total_GB': 139.81, 'free_GB': 134.02, 'used_GB': 5.79}
+Memory-Usage before update_weights: {'gpu': '0', 'total_GB': 139.81, 'free_GB': 130.51, 'used_GB': 9.3}
+Memory-Usage after update_weights: {'gpu': '0', 'total_GB': 139.81, 'free_GB': 126.25, 'used_GB': 13.56}
