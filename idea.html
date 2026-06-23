@@ -3,189 +3,359 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Free-Energy Difficulty Control — idea</title>
+<title>研究 Proposal · 可验证环境 RL 的自由能难度控制</title>
 <style>
-  :root{ --ink:#1a1a1a; --mut:#666; --line:#e3e3e3; --acc:#c0392b; --acc2:#2c7fb8; --bg:#fafaf8; }
+  :root{
+    --ground:#0f1626; --panel:#161f37; --panel2:#1b2746;
+    --text:#e9edf6; --mut:#8b97b4; --line:#27324f;
+    --hot:#ff8a3d;        /* 高温 / 我们的方法 / explore */
+    --cool:#43c4d6;       /* 低温 / SCALER 定点 / exploit */
+    --mono:ui-monospace,"SF Mono","Cascadia Code",Menlo,Consolas,monospace;
+    --serif:Georgia,"Iowan Old Style","Charter","Songti SC","Times New Roman",serif;
+  }
   *{box-sizing:border-box}
-  body{margin:0;background:var(--bg);color:var(--ink);
-    font-family:-apple-system,"Segoe UI",Roboto,"PingFang SC","Microsoft YaHei",sans-serif;
-    line-height:1.65;font-size:16px}
-  .wrap{max-width:780px;margin:0 auto;padding:48px 24px 80px}
-  h1{font-size:30px;line-height:1.25;margin:0 0 6px}
-  .sub{color:var(--mut);margin:0 0 32px}
-  h2{font-size:21px;margin:40px 0 10px;padding-bottom:6px;border-bottom:2px solid var(--line)}
-  p{margin:10px 0}
-  .eq{background:#fff;border:1px solid var(--line);border-left:3px solid var(--acc);
-    padding:12px 16px;margin:14px 0;font-family:"SF Mono",ui-monospace,Menlo,Consolas,monospace;
-    font-size:15px;overflow-x:auto;border-radius:4px}
-  .card{background:#fff;border:1px solid var(--line);border-radius:8px;padding:16px 20px;margin:16px 0}
-  .tag{display:inline-block;font-size:12px;font-weight:600;letter-spacing:.04em;
-    text-transform:uppercase;color:#fff;background:var(--acc);padding:2px 8px;border-radius:4px;margin-bottom:8px}
-  .tag.b{background:var(--acc2)}
-  table{width:100%;border-collapse:collapse;margin:14px 0;font-size:14.5px}
-  th,td{border:1px solid var(--line);padding:8px 10px;text-align:left}
-  th{background:#f1f1ee}
-  .controls{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin:10px 0}
-  .controls label{font-size:14px;color:var(--mut);min-width:96px}
-  input[type=range]{flex:1;min-width:160px;accent-color:var(--acc)}
-  .val{font-family:ui-monospace,monospace;font-weight:600;min-width:64px;text-align:right}
-  canvas{width:100%;height:auto;background:#fff;border:1px solid var(--line);border-radius:6px}
-  .note{font-size:13.5px;color:var(--mut)}
-  .hl{color:var(--acc);font-weight:600}
-  .hl2{color:var(--acc2);font-weight:600}
-  ul{margin:8px 0;padding-left:22px} li{margin:4px 0}
+  html{scroll-behavior:smooth}
+  body{margin:0;background:var(--ground);color:var(--text);
+    font-family:var(--serif);font-size:17px;line-height:1.72;
+    -webkit-font-smoothing:antialiased}
+  .wrap{max-width:820px;margin:0 auto;padding:0 24px}
+
+  /* ---------- header ---------- */
+  header{padding:64px 0 28px;border-bottom:1px solid var(--line)}
+  .kicker{font-family:var(--mono);font-size:12.5px;letter-spacing:.22em;
+    text-transform:uppercase;color:var(--cool);margin:0 0 18px}
+  h1{font-family:var(--mono);font-weight:700;font-size:33px;line-height:1.24;
+    letter-spacing:-.01em;margin:0 0 14px}
+  h1 .em{color:var(--hot)}
+  .lede{font-size:18.5px;color:#c7cee0;margin:14px 0 0;max-width:62ch}
+  .meta{font-family:var(--mono);font-size:12.5px;color:var(--mut);margin-top:22px;
+    display:flex;gap:18px;flex-wrap:wrap}
+  .meta span{white-space:nowrap}
+
+  /* ---------- sections ---------- */
+  section{padding:40px 0;border-bottom:1px solid var(--line)}
+  .sec-h{display:flex;gap:16px;align-items:baseline;margin:0 0 14px}
+  .sec-n{font-family:var(--mono);font-size:13px;color:var(--hot);
+    font-weight:700;letter-spacing:.05em;flex:none;padding-top:4px}
+  h2{font-family:var(--mono);font-weight:700;font-size:21px;letter-spacing:-.005em;margin:0;line-height:1.3}
+  h3{font-family:var(--mono);font-size:15px;font-weight:700;color:#cfd6e8;
+    letter-spacing:.02em;margin:24px 0 6px}
+  p{margin:12px 0;max-width:68ch}
+  strong{color:#fff}
+  .hot{color:var(--hot);font-weight:bold} .cool{color:var(--cool);font-weight:bold}
+
+  /* equation / data blocks */
+  .eq{font-family:var(--mono);font-size:14.5px;background:var(--panel);
+    border:1px solid var(--line);border-left:3px solid var(--hot);
+    border-radius:5px;padding:13px 16px;margin:16px 0;overflow-x:auto;line-height:1.6}
+  .eq.cool{border-left-color:var(--cool)}
+  .eq .c{color:var(--mut)}
+
+  ul{margin:10px 0;padding-left:20px}
+  li{margin:6px 0;max-width:66ch}
+  li::marker{color:var(--hot)}
+
+  .callout{background:linear-gradient(180deg,var(--panel2),var(--panel));
+    border:1px solid var(--line);border-radius:8px;padding:18px 22px;margin:18px 0}
+  .callout .lab{font-family:var(--mono);font-size:11.5px;letter-spacing:.16em;
+    text-transform:uppercase;color:var(--cool);margin-bottom:7px}
+
+  table{width:100%;border-collapse:collapse;margin:16px 0;font-size:14px;
+    font-family:var(--mono)}
+  th,td{border:1px solid var(--line);padding:9px 11px;text-align:left;vertical-align:top}
+  th{background:var(--panel2);color:#dbe2f2;font-weight:700;letter-spacing:.03em}
+  td:first-child{color:#cfd6e8;white-space:nowrap}
+  tr.ours td{background:rgba(255,138,61,.07)}
+  tr.ours td:first-child{color:var(--hot);font-weight:700}
+
+  /* ---------- demo ---------- */
+  .demo{background:var(--panel);border:1px solid var(--line);border-radius:10px;
+    padding:18px 18px 14px;margin:18px 0}
+  canvas{width:100%;height:auto;display:block;border-radius:6px}
+  .ctl{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin:14px 2px 4px;
+    font-family:var(--mono);font-size:13px;color:var(--mut)}
+  .ctl label{min-width:78px;color:#cfd6e8}
+  .track{flex:1;min-width:160px;height:6px;border-radius:6px;appearance:none;
+    -webkit-appearance:none;outline:none}
+  #T{background:linear-gradient(90deg,var(--cool),#8fae6e,var(--hot))}
+  #G{background:var(--line)}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;
+    border-radius:50%;background:#fff;border:2px solid var(--ground);cursor:pointer}
+  input[type=range]::-moz-range-thumb{width:14px;height:14px;border-radius:50%;
+    background:#fff;border:2px solid var(--ground);cursor:pointer}
+  .val{font-weight:700;color:var(--text);min-width:44px;text-align:right}
+  .btn{font-family:var(--mono);font-size:12.5px;color:var(--ground);background:var(--hot);
+    border:none;border-radius:5px;padding:7px 13px;cursor:pointer;font-weight:700;letter-spacing:.03em}
+  .btn:hover{filter:brightness(1.08)}
+  .cap{font-family:var(--mono);font-size:12.5px;color:var(--mut);margin:10px 2px 0;line-height:1.55}
+
+  .foot{padding:34px 0 80px;color:var(--mut);font-family:var(--mono);font-size:12.5px}
+  a{color:var(--cool);text-decoration:none;border-bottom:1px solid var(--line)}
+  :focus-visible{outline:2px solid var(--hot);outline-offset:3px}
+  @media (max-width:560px){ h1{font-size:25px} body{font-size:16px} .sec-h{flex-direction:column;gap:4px} }
 </style>
 </head>
 <body>
 <div class="wrap">
 
-  <h1>给可验证环境的 RL 一个「自由能」难度控制器</h1>
-  <p class="sub">在 SCALER 之上的创新点 · 把「固定 0.5 成功率」推广成一个有理论的目标</p>
+  <header>
+    <p class="kicker">Research Proposal · RL with Env Scaling</p>
+    <h1>用<span class="em">自由能</span>把「难度自适应」<br>从一个定点变成一个目标</h1>
+    <p class="lede">SCALER 把训练难度调到「成功率 ≈ 0.5」这一个固定点。我们提出:把难度选择写成一个<strong>自由能最小化</strong>问题,
+    其最优解是一个由<strong>温度</strong>控制的 Gibbs 分布——SCALER 只是它在零温下的特例。</p>
+    <div class="meta">
+      <span>基线框架 · SCALER (verl)</span>
+      <span>奖励验证 · SandboxFusion</span>
+      <span>模型 · Qwen2.5-3B-Instruct</span>
+      <span>算力 · 单卡 H200</span>
+    </div>
+  </header>
 
-  <h2>1. 背景:RL 为什么会「学不动」</h2>
-  <p>用 RL 训模型做推理,每道题会采 <b>G 个回答</b>(比如 G=8),用程序自动判每个对(1)/错(0),
-  再用 GRPO 在组内做对比来更新。关键事实:</p>
-  <div class="card">
-    <b>一组回答如果「全对」或「全错」,组内没有差异 → 梯度为 0 → 这组白采。</b><br>
-    只有「有对有错」的组才提供学习信号。
-  </div>
-  <p>设这道题答对概率为 <b>p</b>,组内奖励方差是 <b>p(1−p)</b>,在 <b>p=0.5</b> 时最大;
-  「一组有对有错」的概率是 <span class="eq" style="display:inline;border:none;padding:0;border-left:none">U = 1 − pᴳ − (1−p)ᴳ</span>,
-  同样在 0.5 最大。<b>难度刚好让模型对一半,信号最强。</b></p>
+  <!-- 00 -->
+  <section>
+    <div class="sec-h"><div class="sec-n">00</div><h2>一句话定位</h2></div>
+    <p>在「可验证环境 + 强化学习」这条路线上(RLVR → RLVE → SCALER),程序能无限出题、用算法/单元测试自动判分,难度由一个旋钮 <code>d</code> 控制。
+    本 proposal 不改这套环境与训练框架,而是<strong>重新设计其中的「难度控制器」</strong>:从一个工程启发式,升级为一个有显式目标、可推导、可退化回基线的控制律。</p>
+  </section>
 
-  <h2>2. SCALER 做了什么</h2>
-  <p>SCALER(我们复现的框架)把真实代码题合成成<b>可验证环境</b>:程序无限出题、用单元测试自动判分、
-  用一个旋钮 <b>d</b> 控制难度。它的难度控制器是一个<b>定点调节</b>:</p>
-  <div class="eq">测到成功率偏离 0.5 → 把难度 d 往回调,使 success → 固定的 0.5</div>
-  <p class="note">即:只盯住「成功率 = 0.5」这一个目标点。简单有效,但它没有一个被优化的显式目标,
-  也没说为什么是 0.5、以及难度该如何在多个档位间分配。</p>
+  <!-- 01 -->
+  <section>
+    <div class="sec-h"><div class="sec-n">01</div><h2>前因:为什么固定难度会「学不动」</h2></div>
+    <p>GRPO/DAPO 的训练单元是<strong>一组</strong> rollout:对同一道题采 <code>G</code> 个回答(典型 G=8),每个由 verifier 判对(1)/错(0),
+    再在组内做相对优势来更新策略。一个关键的、决定成败的性质:</p>
+    <div class="callout">
+      <div class="lab">失效机制</div>
+      一组回答若<strong>全对</strong>或<strong>全错</strong>,组内奖励没有差异 → 优势恒为 0 → <strong>这一组贡献的梯度为零,算力被浪费</strong>。
+      DAPO 干脆把这种「零方差组」直接丢弃。
+    </div>
+    <p>设模型在某难度的答对概率为 <code>p</code>。组内奖励方差是 <span class="hot">p(1−p)</span>,在 <code>p=0.5</code> 时最大;
+    「这一组有对有错(可用)」的概率为 <span class="hot">U = 1 − pᴳ − (1−p)ᴳ</span>,同样在 0.5 最大。直观代入(G=8):</p>
+    <div class="eq">
+p=0.95（太易）→ 整组全对 ≈ 0.95⁸ ≈ <span class="c">66% 的组白采</span>
+p=0.50（适中）→ 全对或全错各 ≈ 0.4%   → <span class="c">99% 的组有效</span>
+p=0.10（太难）→ 整组全错 ≈ 0.9⁸ ≈ <span class="c">43% 的组白采</span>
+    </div>
+    <p><strong>结论:固定难度必然失败。</strong>太易 → 很快全对、信号枯竭;太难 → 长期全错、几乎不更新。
+    只有把成功率维持在 0.5 附近,梯度信号才持续存在。这正是「可验证环境 + 自适应难度」这条路线要解决的核心。</p>
+  </section>
 
-  <h2>3. 我们的想法:不盯一个点,而是优化一个分布(自由能 + Gibbs)</h2>
-  <p>把每个难度档的「学习价值」记为 <b>U(d)=1−p(d)ᴳ−(1−p(d))ᴳ</b>。
-  与其塌到单个最优点,我们在所有难度档上选一个<b>采样分布 q(d)</b>,最小化<b>自由能</b>:</p>
-  <div class="eq">F[q] = − E<sub>q</sub>[U]  −  T · H[q]      （H 是熵,T 是温度）</div>
-  <p><span class="hl">能量项</span> −E[U]:把概率投向学习价值高的难度。
-  <span class="hl2">熵项</span> T·H:保持多样性、不要孤注一掷。两者最优折中的解,正是物理里的 <b>Gibbs / 玻尔兹曼分布</b>:</p>
-  <div class="eq" style="border-left-color:var(--acc2)">q*(d)  ∝  exp( U(d) / T )</div>
-
-  <div class="card">
-    <span class="tag b">Gibbs 是什么</span>
-    <p style="margin:6px 0">一句话:<b>「价值越高的选项,概率指数级越大;温度 T 控制这个偏好有多极端」</b>。</p>
+  <!-- 02 -->
+  <section>
+    <div class="sec-h"><div class="sec-n">02</div><h2>原方法:SCALER 怎么做、用什么数据</h2></div>
+    <h3>数据 — 从真实代码题合成可验证环境</h3>
+    <p>SCALER 把<strong>真实竞赛编程题</strong>(题面 + 参考解,来自 code_contest 一类数据)自动合成为「可验证环境」。每个环境包含:</p>
     <ul>
-      <li><b>T → 0</b>(低温):全部概率压到价值最高的那个难度 = argmax U(d) ≈ 成功率 0.5 那一档
-        —— <span class="hl">这就退化成 SCALER 的定点</span>。所以 SCALER 是我们框架的一个特例。</li>
-      <li><b>T → ∞</b>(高温):各难度均匀采样 = 最大探索 / 难度多样。</li>
-      <li><b>中间 T</b>:既聚焦最有信息的难度,又顺带探索邻近难度;还会自动放弃「已饱和(p→1)」和「学不动(p→0)」的难度(它们 U 很低)。</li>
+      <li><strong>可验证</strong>:带参考解 / 单元测试,运行后得到标准答案;判分由 <span class="cool">SandboxFusion</span> 代码沙箱执行(参考解多为 C++)。</li>
+      <li><strong>可控难度</strong>:一个 scale 参数(如规模 n)离散成难度等级 <code>d</code>;<code>difficulty_dict</code> 把 d 映射到具体规模。</li>
+      <li><strong>无限实例</strong>:用随机测例生成器,在任意难度下生成无穷多道题。</li>
     </ul>
-  </div>
-  <p class="note">额外好处:同一个目标若写成 U(环境,难度),它的「环境维度边缘分布」就是<b>环境选择权重</b>
-  —— 难度控制和环境取舍由一个目标统一导出。</p>
+    <p class="cap">已开源环境池:SCALER-{8, 64, 512, 2739}.json(由约 4973 道题合成 2739 个环境);评测集:MATH-500 / AMC23 / AIME24 / MMLU-Pro / BBEH / GPQA。</p>
 
-  <h2>4. 交互演示:温度 T 如何决定难度分布</h2>
-  <p>下图:左为各难度的成功率 p(d) 与学习价值 U(d);右为 Gibbs 采样分布 q(d)∝exp(U/T)。拖动温度看它从「聚焦 0.5」到「均匀探索」。</p>
-  <div class="controls">
-    <label>温度 T</label>
-    <input id="T" type="range" min="0.02" max="1.5" step="0.02" value="0.5">
-    <span class="val" id="Tval">0.50</span>
-  </div>
-  <div class="controls">
-    <label>组大小 G</label>
-    <input id="G" type="range" min="2" max="16" step="1" value="8">
-    <span class="val" id="Gval">8</span>
-  </div>
-  <canvas id="cv" width="760" height="300"></canvas>
-  <p class="note" id="caption"></p>
+    <h3>难度控制器 — 一个固定定点的反馈调节</h3>
+    <p>SCALER 维护一个连续难度 <code>d</code>,用观测到的成功率做比例反馈,把它拉向一个<strong>固定目标</strong>:</p>
+    <div class="eq cool">
+err = success_rate − <span style="color:var(--cool)">target(=0.5)</span>
+d  ← clip( d + k · err ,  [d_min, d_max] )
+    </div>
+    <h3 style="color:var(--hot)">问题在哪(本 proposal 的出发点)</h3>
+    <ul>
+      <li><strong>没有显式目标</strong>:它是一个 setpoint 调节器,没有一个被优化的目标函数,因而难以分析、难以推广。</li>
+      <li><strong>0.5 是写死的</strong>:对二值奖励 0.5 恰好最优,但奖励一旦变成「通过测例比例」等连续形式,最优点就会偏离 0.5——定点无法自适应。</li>
+      <li><strong>塌成单点、缺乏探索</strong>:只盯一个难度点,没有显式的「多样性 / 探索」项,也不会主动放弃已饱和的难度。</li>
+      <li><strong>难度与环境选择割裂</strong>:环境之间怎么分配算力,用的是另一套启发式(难度斜率),与难度控制不在同一目标下。</li>
+    </ul>
+  </section>
 
-  <h2>5. 实验:5 个臂的对照(同模型 / 同算力)</h2>
-  <table>
-    <tr><th>臂</th><th>难度策略</th><th>预期现象</th></tr>
-    <tr><td>static-易</td><td>难度焊死(低)</td><td>很快全对 → 信号塌掉(有效样本率→0)</td></tr>
-    <tr><td>static-中 / 难</td><td>难度焊死(中/高)</td><td>偏难 → 大量全错,学得慢</td></tr>
-    <tr><td>SCALER-adaptive</td><td>定点 0.5</td><td>维持中等难度,信号较高</td></tr>
-    <tr><td class="hl">free-energy(我们)</td><td>q(d)∝exp(U/T)</td><td>有效样本率最高、泛化最好(待验证)</td></tr>
-  </table>
-  <p>核心度量 = <b>有效样本率</b>(每步「有对有错」的组占比);外加训练前后在 MATH-500 / AIME / AMC / MMLU-Pro / BBEH / GPQA 上的<b>泛化</b>。</p>
-  <p class="note">合成数据初步验证(同格式):static-易 0.22 / static-难 0.49 / adaptive 0.99 —— 自适应把信号维持得最高,正是我们要证明的机理。</p>
+  <!-- 03 -->
+  <section>
+    <div class="sec-h"><div class="sec-n">03</div><h2>如何深入:把难度选择写成自由能最小化</h2></div>
+    <p>核心思路:不要盯住一个最优点,而是在<strong>所有难度档上选一个采样分布</strong> <code>q(d)</code>,让它最小化一个借自统计力学的<strong>自由能</strong>泛函。
+    先把每个难度的「学习价值」(能量的反面)定义为上面的可用组概率:</p>
+    <div class="eq">U(d) = 1 − p(d)ᴳ − (1−p(d))ᴳ      <span class="c"># 学习价值,p=0.5 处最大</span></div>
+    <p>把 <code>−U</code> 当作能量,在分布 <code>q</code> 上写出自由能:</p>
+    <div class="eq">
+F[q] = − E<sub>q</sub>[U(d)]  −  T · H[q]        <span class="c"># H 为熵, T 为温度</span>
+       └─ 能量:概率投向高价值难度    └─ 熵:保持多样性/探索
+    </div>
+    <h3>为什么叫「自由能」,以及它给了什么</h3>
+    <p>自由能 = <strong>能量 − 温度 × 熵</strong>,是物理里在「降低能量」与「保持无序(熵)」之间权衡的标准量。
+    对它求极小(在 <code>Σq=1</code> 约束下用拉格朗日乘子),得到的最优分布正是 <strong>Gibbs / 玻尔兹曼分布</strong>:</p>
+    <div class="eq">q*(d) ∝ exp( U(d) / T )        F[q*] = −T · log Σ<sub>d</sub> exp(U(d)/T)</div>
+    <div class="callout">
+      <div class="lab">三个极限 — 为什么这是「推广」而非「替换」</div>
+      <ul style="margin:4px 0">
+        <li><span class="cool">T → 0</span>(低温):概率全压到 argmax U(d) ≈ 成功率 0.5 那一档 → <strong>精确退化回 SCALER 的定点</strong>。</li>
+        <li><span class="hot">T → ∞</span>(高温):各难度均匀采样 → 最大探索 / 难度多样性。</li>
+        <li><strong>中间 T</strong>:既聚焦最有信息的难度,又探索邻近难度;并自动放弃 p→1(饱和)与 p→0(学不动)的难度,因其 U 极低。</li>
+      </ul>
+    </div>
+    <p><strong>顺带统一了环境选择。</strong>若把价值写成 <code>U(e,d)</code>(环境 e、难度 d),同一推导给出 <code>q*(e,d) ∝ exp(U(e,d)/T)</code>,
+    其环境边缘分布 <code>q*(e) ∝ Σ_d exp(U(e,d)/T)</code> 就是<strong>环境采样权重</strong>(等于该环境的负自由能)。
+    于是「环境内难度控制」与「环境间算力分配」由<strong>同一个目标、同一个温度旋钮</strong>导出。</p>
+  </section>
 
-  <h2>6. 一句话总结</h2>
-  <div class="card" style="border-left:3px solid var(--acc)">
-    SCALER 把难度盯在「成功率 0.5」;我们把它推广成<b>最小化自由能</b> F=−E[U]−T·H,
-    最优解是 <b>Gibbs 分布 q(d)∝exp(U(d)/T)</b>。一个温度旋钮 T 统一了「利用 vs 探索」和「难度 vs 环境选择」,
-    <b>T→0 就还原成 SCALER</b>,中间温度则维持更多学习信号。
+  <!-- demo -->
+  <section>
+    <div class="sec-h"><div class="sec-n">▸</div><h2>交互:温度 T 如何决定难度分布</h2></div>
+    <p>下图为单一能量景观:<span class="cool">p(d)</span> 成功率、<span class="hot">U(d)</span> 学习价值,以及按 Gibbs 采样的难度分布 <code>q(d)</code>(填充区,颜色随温度由冷变暖)。
+    拖动温度,观察 <code>q</code> 从「集中在 0.5 那档(≈SCALER)」到「均匀探索」的连续过渡。</p>
+    <div class="demo">
+      <canvas id="cv" width="780" height="320" aria-label="温度控制的 Gibbs 难度分布演示"></canvas>
+      <div class="ctl">
+        <label for="T">温度 T</label>
+        <input id="T" class="track" type="range" min="0.03" max="1.5" step="0.01" value="0.45">
+        <span class="val" id="Tv">0.45</span>
+        <button class="btn" id="anneal">▸ 退火 T:热→冷</button>
+      </div>
+      <div class="ctl">
+        <label for="G">组大小 G</label>
+        <input id="G" class="track" type="range" min="2" max="16" step="1" value="8">
+        <span class="val" id="Gv">8</span>
+      </div>
+      <p class="cap" id="cap"></p>
+    </div>
+  </section>
+
+  <!-- 04 -->
+  <section>
+    <div class="sec-h"><div class="sec-n">04</div><h2>具体怎么操作:在线控制器 + 落地</h2></div>
+    <p>真实的 <code>p(d)</code> 未知,故在线估计。每个训练步:</p>
+    <div class="eq">
+1. 由 q*(d) ∝ exp(U(d)/T) 采样本步各难度          <span class="c"># 出题</span>
+2. rollout + 沙箱判分,得各难度的成功率           <span class="c"># 观测</span>
+3. p̂(d) ← EMA 更新,重算 U(d)                     <span class="c"># 学习价值</span>
+4. 退火温度 T: T₀ → T_min                         <span class="c"># 逐步聚焦</span>
+    </div>
+    <h3>工程落地(已实现,零基础设施改动)</h3>
+    <ul>
+      <li>实现为 SCALER 难度模块的 <strong>drop-in 控制器</strong>,完全复用其接口(<code>propose_distances / update / 序列化</code>),可直接读取 SCALER 现成的环境 JSON。</li>
+      <li>用环境变量 <code>DIFFICULTY_MODE=freeenergy</code> 切换:不设则<strong>逐字保持 SCALER 原行为</strong>(对照公平)。</li>
+      <li>超参经环境变量注入(G、T₀、T_min、退火步数、EMA),无需重生成数据。</li>
+    </ul>
+  </section>
+
+  <!-- 05 -->
+  <section>
+    <div class="sec-h"><div class="sec-n">05</div><h2>实验设计与验证</h2></div>
+    <h3>数据划分</h3>
+    <p>从 SCALER-8 取 <strong>5 个训练环境</strong>,留 <strong>3 个 held-out 环境</strong>;另在 6 个公开 benchmark 上评训练前/后,衡量跨分布泛化。</p>
+    <h3>五个对照臂(同模型、同算力,只换难度策略)</h3>
+    <table>
+      <tr><th>臂</th><th>难度策略</th><th>检验的假设</th></tr>
+      <tr><td>static-易</td><td>难度焊死(低)</td><td>很快全对 → 信号枯竭</td></tr>
+      <tr><td>static-中</td><td>难度焊死(中)</td><td>固定点的中庸表现</td></tr>
+      <tr><td>static-难</td><td>难度焊死(高)</td><td>长期全错 → 学不动</td></tr>
+      <tr><td>SCALER-adaptive</td><td>定点 0.5(基线)</td><td>维持中等难度的信号</td></tr>
+      <tr class="ours"><td>free-energy(本工作)</td><td>q(d)∝exp(U/T)</td><td>信号最高 · 泛化最好 · T→0 复现基线</td></tr>
+    </table>
+    <h3>核心指标</h3>
+    <ul>
+      <li><strong>有效样本率</strong>(机理指标):每步「有对有错」的组占比 = <code>1 − pᴳ − (1−p)ᴳ</code> 的实测均值。预期 static 很快塌向 0、adaptive 维持、free-energy 最高。</li>
+      <li><strong>泛化</strong>:训练前后在 held-out 环境 + 6 benchmark 上的准确率差。</li>
+      <li><strong>难度轨迹</strong>:static 为平线、SCALER 收敛到 0.5 带、free-energy 为一个随温度收缩的分布。</li>
+      <li><strong>温度消融</strong>:扫 T,并数值验证 <span class="cool">T→0 复现 SCALER</span>。</li>
+    </ul>
+    <div class="callout">
+      <div class="lab">初步验证(合成策略,同日志格式)</div>
+      有效样本率:static-易 <span class="cool">0.22</span> · static-难 <span class="cool">0.49</span> · 自适应 <span class="hot">0.99</span>。
+      与理论预期一致——自适应把学习信号维持得最高。真实 SCALER 上的 free-energy 臂正在跑,数据回填后更新此处。
+    </div>
+    <h3>诚实的边界 / 失败情形</h3>
+    <p>当模型能力超过 <code>d_max</code>,所有难度都饱和、<code>U→0</code>,任何控制器都无信号可调——这反过来说明需要<strong>扩充环境</strong>(env scaling),呼应 RLVE/SCALER 的核心论点,也是本工作的自然延伸。</p>
+  </section>
+
+  <!-- 06 -->
+  <section style="border-bottom:none">
+    <div class="sec-h"><div class="sec-n">06</div><h2>贡献小结</h2></div>
+    <ul>
+      <li>指出并形式化 SCALER 定点控制器的局限,把难度选择重述为<strong>自由能最小化</strong>,给出闭式 Gibbs 解与三个极限(含 T→0 复现基线)。</li>
+      <li>同一目标<strong>统一</strong>了环境内难度控制与环境间算力分配。</li>
+      <li>提供 drop-in、可切换、可复现的实现,以及以<strong>有效样本率</strong>为机理指标的五臂对照实验设计。</li>
+    </ul>
+  </section>
+
+  <div class="foot">
+    基线:SCALER (arXiv:2601.04809, ACL 2026 Findings) · RLVE (arXiv:2511.07317)　|　代码:github.com/0xLian117/RLproj/scaler_addon
   </div>
-
 </div>
 
 <script>
-const cv=document.getElementById('cv'), ctx=cv.getContext('2d');
-const Tin=document.getElementById('T'), Gin=document.getElementById('G');
-const Tval=document.getElementById('Tval'), Gval=document.getElementById('Gval');
-const cap=document.getElementById('caption');
-const DMAX=20, d0=10, s=3.0;             // 成功率随难度下降,d0 处 p=0.5
-function sig(x){return 1/(1+Math.exp(-x));}
-function pOf(d){return sig(-(d-d0)/s);}  // p(d)
-function Uof(d,G){const p=pOf(d);return 1-Math.pow(p,G)-Math.pow(1-p,G);}
-
-function draw(){
-  const T=parseFloat(Tin.value), G=parseInt(Gin.value);
-  Tval.textContent=T.toFixed(2); Gval.textContent=G;
-  const W=cv.width,H=cv.height; ctx.clearRect(0,0,W,H);
-  const padL=44,padR=20,padT=18,padB=34, midGap=40;
-  const colW=(W-padL-padR-midGap)/2;
-  const x0L=padL, x0R=padL+colW+midGap;
-  const plotH=H-padT-padB;
-  const levels=[]; for(let d=0;d<=DMAX;d++) levels.push(d);
-  // Gibbs q
-  const us=levels.map(d=>Uof(d,G)); const m=Math.max(...us);
-  const ws=us.map(u=>Math.exp((u-m)/Math.max(1e-6,T)));
-  const z=ws.reduce((a,b)=>a+b,0); const q=ws.map(w=>w/z);
-  const qmax=Math.max(...q);
-
-  ctx.font='12px ui-monospace,monospace'; ctx.fillStyle='#666'; ctx.strokeStyle='#ddd';
-  function axes(x0,title){
-    ctx.strokeStyle='#ddd'; ctx.beginPath();
-    ctx.moveTo(x0,padT); ctx.lineTo(x0,padT+plotH); ctx.lineTo(x0+colW,padT+plotH); ctx.stroke();
-    ctx.fillStyle='#1a1a1a'; ctx.font='13px sans-serif'; ctx.fillText(title,x0,padT-4);
-    ctx.fillStyle='#666'; ctx.font='11px sans-serif';
-    ctx.fillText('难度 d→',x0+colW-46,padT+plotH+16);
+(function(){
+  const cv=document.getElementById('cv'), ctx=cv.getContext('2d');
+  const Tin=document.getElementById('T'), Gin=document.getElementById('G');
+  const Tv=document.getElementById('Tv'), Gv=document.getElementById('Gv');
+  const cap=document.getElementById('cap'), btn=document.getElementById('anneal');
+  const DMAX=20, d0=10, s=3.0;
+  const sig=x=>1/(1+Math.exp(-x));
+  const pOf=d=>sig(-(d-d0)/s);
+  const Uof=(d,G)=>{const p=pOf(d);return 1-Math.pow(p,G)-Math.pow(1-p,G);};
+  const lerp=(a,b,t)=>a+(b-a)*t;
+  // cool #43c4d6 -> hot #ff8a3d
+  function thermal(t){ // t in [0,1]
+    const r=Math.round(lerp(0x43,0xff,t)), g=Math.round(lerp(0xc4,0x8a,t)), b=Math.round(lerp(0xd6,0x3d,t));
+    return `rgb(${r},${g},${b})`;
   }
-  const X=(x0,d)=>x0+(d/DMAX)*colW;
-
-  // ---- LEFT: p(d) and U(d) ----
-  axes(x0L,'p(d) 与 U(d)');
-  // U(d) curve (red)
-  ctx.strokeStyle='#c0392b'; ctx.lineWidth=2; ctx.beginPath();
-  levels.forEach((d,i)=>{const x=X(x0L,d),y=padT+plotH-Uof(d,G)*plotH; i?ctx.lineTo(x,y):ctx.moveTo(x,y);});
-  ctx.stroke();
-  // p(d) curve (blue)
-  ctx.strokeStyle='#2c7fb8'; ctx.lineWidth=2; ctx.setLineDash([4,3]); ctx.beginPath();
-  levels.forEach((d,i)=>{const x=X(x0L,d),y=padT+plotH-pOf(d)*plotH; i?ctx.lineTo(x,y):ctx.moveTo(x,y);});
-  ctx.stroke(); ctx.setLineDash([]);
-  // mark d0 (p=0.5)
-  const xd0=X(x0L,d0); ctx.strokeStyle='#aaa'; ctx.setLineDash([2,3]);
-  ctx.beginPath(); ctx.moveTo(xd0,padT); ctx.lineTo(xd0,padT+plotH); ctx.stroke(); ctx.setLineDash([]);
-  ctx.fillStyle='#888'; ctx.font='11px sans-serif'; ctx.fillText('p=0.5',xd0-14,padT+10);
-  ctx.fillStyle='#c0392b'; ctx.fillText('U(d) 学习价值',x0L+6,padT+plotH-Uof(2,G)*plotH-6);
-  ctx.fillStyle='#2c7fb8'; ctx.fillText('p(d) 成功率',x0L+colW-72,padT+plotH-pOf(DMAX-2)*plotH-6);
-
-  // ---- RIGHT: Gibbs q(d) bars ----
-  axes(x0R,'q(d) ∝ exp(U(d)/T)');
-  const bw=colW/(DMAX+1)*0.7;
-  levels.forEach(d=>{
-    const x=X(x0R,d)-bw/2, h=(q[d]/qmax)*plotH*0.92, y=padT+plotH-h;
-    ctx.fillStyle = Math.abs(d-d0)<0.5 ? '#c0392b' : '#9bb7c9';
-    ctx.fillRect(x,y,bw,h);
-  });
-  ctx.fillStyle='#888'; ctx.font='11px sans-serif';
-  ctx.fillText('红=p≈0.5 档',x0R+6,padT+12);
-
-  // caption
-  let regime = T<0.12 ? '低温:几乎全部概率集中在 p≈0.5 那一档 —— 等价于 SCALER 的定点。'
-            : T>1.0 ? '高温:难度接近均匀采样 —— 最大探索 / 多样性。'
-            : '中等温度:聚焦最有信息的难度,同时探索邻近难度。';
-  cap.innerHTML='当前 T='+T.toFixed(2)+',G='+G+'。 '+regime;
-}
-Tin.oninput=draw; Gin.oninput=draw; draw();
+  function draw(){
+    const T=parseFloat(Tin.value), G=parseInt(Gin.value);
+    Tv.textContent=T.toFixed(2); Gv.textContent=G;
+    const W=cv.width,H=cv.height; ctx.clearRect(0,0,W,H);
+    const L=46,R=18,Tp=40,B=40, pw=W-L-R, ph=H-Tp-B;
+    const X=d=>L+(d/DMAX)*pw, Y=v=>Tp+ph-v*ph;
+    const levels=[]; for(let d=0;d<=DMAX;d++)levels.push(d);
+    // gibbs
+    const us=levels.map(d=>Uof(d,G)), m=Math.max(...us);
+    const ws=us.map(u=>Math.exp((u-m)/Math.max(1e-6,T)));
+    const z=ws.reduce((a,b)=>a+b,0), q=ws.map(w=>w/z), qmax=Math.max(...q);
+    const tnorm=Math.min(1,Math.max(0,(T-0.03)/(1.5-0.03)));
+    // axes
+    ctx.strokeStyle='#27324f'; ctx.lineWidth=1; ctx.beginPath();
+    ctx.moveTo(L,Tp); ctx.lineTo(L,Tp+ph); ctx.lineTo(L+pw,Tp+ph); ctx.stroke();
+    ctx.fillStyle='#8b97b4'; ctx.font='11px ui-monospace,monospace';
+    ctx.fillText('难度 d →', L+pw-58, Tp+ph+26);
+    ctx.fillText('1.0',6,Tp+6); ctx.fillText('0',18,Tp+ph+4);
+    // p=0.5 guide
+    const xd=X(d0); ctx.strokeStyle='rgba(139,151,180,.5)'; ctx.setLineDash([3,4]);
+    ctx.beginPath(); ctx.moveTo(xd,Tp); ctx.lineTo(xd,Tp+ph); ctx.stroke(); ctx.setLineDash([]);
+    ctx.fillStyle='#8b97b4'; ctx.fillText('p=0.5',xd-15,Tp-6);
+    // q(d) filled area (thermal)
+    const col=thermal(tnorm);
+    ctx.beginPath(); ctx.moveTo(X(0),Tp+ph);
+    levels.forEach(d=>ctx.lineTo(X(d),Y(0.9*q[d]/qmax)));
+    ctx.lineTo(X(DMAX),Tp+ph); ctx.closePath();
+    ctx.fillStyle=col.replace('rgb','rgba').replace(')',',0.22)'); ctx.fill();
+    ctx.strokeStyle=col; ctx.lineWidth=2; ctx.beginPath();
+    levels.forEach((d,i)=>{const x=X(d),y=Y(0.9*q[d]/qmax); i?ctx.lineTo(x,y):ctx.moveTo(x,y);}); ctx.stroke();
+    // U(d) line (hot, thin)
+    ctx.strokeStyle='rgba(255,138,61,.85)'; ctx.lineWidth=1.6; ctx.setLineDash([5,3]); ctx.beginPath();
+    levels.forEach((d,i)=>{const x=X(d),y=Y(Uof(d,G)); i?ctx.lineTo(x,y):ctx.moveTo(x,y);}); ctx.stroke(); ctx.setLineDash([]);
+    // p(d) line (cool, thin)
+    ctx.strokeStyle='rgba(67,196,214,.7)'; ctx.lineWidth=1.4; ctx.beginPath();
+    levels.forEach((d,i)=>{const x=X(d),y=Y(pOf(d)); i?ctx.lineTo(x,y):ctx.moveTo(x,y);}); ctx.stroke();
+    // legend
+    ctx.font='11px ui-monospace,monospace'; ctx.textAlign='left';
+    ctx.fillStyle=col; ctx.fillText('■ q(d) 采样分布', L+6, Tp+14);
+    ctx.fillStyle='rgba(255,138,61,.9)'; ctx.fillText('-- U(d) 学习价值', L+128, Tp+14);
+    ctx.fillStyle='rgba(67,196,214,.85)'; ctx.fillText('— p(d) 成功率', L+262, Tp+14);
+    // caption
+    let r = T<0.12 ? '低温:概率几乎全部集中在 p≈0.5 那一档 —— 等价于 SCALER 的固定定点(纯利用)。'
+          : T>1.0  ? '高温:难度接近均匀采样 —— 最大探索 / 难度多样性。'
+          : '中等温度:聚焦最有信息的难度,同时探索邻近难度,自动避开饱和与过难区。';
+    cap.textContent='T='+T.toFixed(2)+' · G='+G+' — '+r;
+  }
+  let raf=null;
+  function anneal(){
+    if(raf) cancelAnimationFrame(raf);
+    let T=1.5; Tin.value=T;
+    const step=()=>{ T*=0.965; if(T<0.05){T=0.05;Tin.value=T;draw();raf=null;return;}
+      Tin.value=T; draw(); raf=requestAnimationFrame(step); };
+    const reduce=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if(reduce){ Tin.value=0.05; draw(); } else step();
+  }
+  Tin.addEventListener('input',()=>{if(raf){cancelAnimationFrame(raf);raf=null;}draw();});
+  Gin.addEventListener('input',draw);
+  btn.addEventListener('click',anneal);
+  draw();
+})();
 </script>
 </body>
 </html>
