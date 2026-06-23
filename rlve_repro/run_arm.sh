@@ -21,6 +21,10 @@ RESP_LEN=${RESP_LEN:-8192}
 ROLLOUT_BSZ=${ROLLOUT_BSZ:-32}
 N_SAMPLES=${N_SAMPLES:-8}
 MAX_TOK=${MAX_TOK:-8192}
+# 时长控制:总步数 / 存档间隔 / 评测间隔
+MAX_STEPS=${MAX_STEPS:-50}                  # --num-rollout(对照只需分化,~50 步足够)
+SAVE_EVERY=${SAVE_EVERY:-${MAX_STEPS}}      # 默认只在最后存一次,省盘省时
+EVAL_EVERY=${EVAL_EVERY:-25}                # held-out 环境评测间隔(给泛化曲线)
 # 你的模型路径
 MODEL_HF=${MODEL_HF:-/inspire/hdd/global_user/chenglian-253104020001/models/Nemotron-Research-Reasoning-Qwen-1.5B-v2}
 MODEL_DIST=${MODEL_DIST:-${MODEL_HF}_torch_dist}
@@ -46,6 +50,10 @@ sed -i -E "s/--rollout-max-response-len 24576/--rollout-max-response-len ${RESP_
 sed -i -E "s/--rollout-batch-size 128/--rollout-batch-size ${ROLLOUT_BSZ}/" "$RLVE_SH"
 sed -i -E "s/--n-samples-per-prompt 16/--n-samples-per-prompt ${N_SAMPLES}/" "$RLVE_SH"
 sed -i -E "s/--max-tokens-per-gpu 3072/--max-tokens-per-gpu ${MAX_TOK}/" "$RLVE_SH"
+# 时长控制:总步数 / 存档 / 评测间隔
+sed -i -E "s/--num-rollout 1000000/--num-rollout ${MAX_STEPS}/" "$RLVE_SH"
+sed -i -E "s/--save-interval 1/--save-interval ${SAVE_EVERY}/" "$RLVE_SH"
+sed -i -E "s/--eval-interval 20/--eval-interval ${EVAL_EVERY}/" "$RLVE_SH"
 
 echo "== [2] 指向你的模型 =="
 # 用 # 作分隔符,免去路径里 / 的转义;先换更长的 ref-load(_torch_dist),再换 hf-checkpoint
