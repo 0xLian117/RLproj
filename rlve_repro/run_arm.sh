@@ -17,11 +17,11 @@ ARM=${ARM:-adaptive}                 # adaptive(RLVE-90) | static | signal(Signa
 NUM_ENV=${NUM_ENV:-16}               # 1 / 4 / 16 / 256 / 400
 STATIC_D=${STATIC_D:-4}              # 仅 static 臂:冻结的难度等级
 # 单卡负载(OOM 就调小)
-RESP_LEN=${RESP_LEN:-4096}
+RESP_LEN=${RESP_LEN:-8192}
 ROLLOUT_BSZ=${ROLLOUT_BSZ:-8}        # 保守默认:单卡 colocate 训练 batch(原 32)
 N_SAMPLES=${N_SAMPLES:-8}
 MAX_TOK=${MAX_TOK:-2048}             # 保守默认:训练单卡峰值 token(原 8192;OOM 就靠它)
-OVERSAMPLE=${OVERSAMPLE:-8}           # DAPO 超采样 prompt 数(原版 384!→ 每步生成 OVERSAMPLE×N_SAMPLES 条)
+OVERSAMPLE=${OVERSAMPLE:-16}          # DAPO 超采样 prompt 数(原版 384!→ 每步生成 OVERSAMPLE×N_SAMPLES 条)
 SGLANG_MEM=${SGLANG_MEM:-0.4}        # 保守默认:SGLang 静态显存占比(原 0.7);留更多给训练侧,治 colocate OOM
 if [ "$OVERSAMPLE" -lt "$ROLLOUT_BSZ" ]; then OVERSAMPLE=$ROLLOUT_BSZ; fi   # 防 over<rollout 的 assert
 # 时长控制:总步数 / 存档间隔 / 评测间隔
@@ -36,26 +36,7 @@ SAVE_ROOT=${SAVE_ROOT:-/inspire/hdd/global_user/chenglian-253104020001/rlve_ckpt
 export WANDB_MODE=${WANDB_MODE:-offline}             # offline 不连服务器(disabled 会被 SLIME shared 模式无视→挂)
 export WANDB_API_KEY=${WANDB_API_KEY:-offline}
 export WANDB_DIR=${WANDB_DIR:-/inspire/hdd/global_user/chenglian-253104020001/wandb}  # 离线文件夹写大盘,别堆 RLVE 根
-export RAY_DEDUP_LOGS=${RAY_DEDUP_LOGS:-0}
-export PYTORCH_CUDA_ALLOC_CONF=${PYTORCH_CUDA_ALLOC_CONF:-expandable_segments:True}
 mkdir -p "$SAVE_ROOT" "$WANDB_DIR"
-
-dump_failure_context() {
-  local rc=$?
-  echo
-  echo "== 失败诊断:Ray actor died 常见原因是 CPU/GPU OOM;下面是最后现场 =="
-  if command -v nvidia-smi >/dev/null 2>&1; then
-    nvidia-smi || true
-  fi
-  for f in /tmp/ray/session_latest/logs/raylet.out /tmp/ray/session_latest/logs/raylet.err; do
-    if [ -f "$f" ]; then
-      echo "== tail -n 80 $f =="
-      tail -n 80 "$f" || true
-    fi
-  done
-  exit "$rc"
-}
-trap dump_failure_context ERR
 
 MODELDIR=Nemotron-Research-Reasoning-Qwen-1.5B-v2
 RLVE_SH=scripts/training/${MODELDIR}/rlve.sh
@@ -66,8 +47,6 @@ RLVE_SH=scripts/training/${MODELDIR}/rlve.sh
 cp "${RLVE_SH}.orig" "$RLVE_SH"
 
 echo "== [1] 8 卡 → 单卡 + 缩小负载 =="
-echo "负载: RESP_LEN=${RESP_LEN} ROLLOUT_BSZ=${ROLLOUT_BSZ} N_SAMPLES=${N_SAMPLES} OVERSAMPLE=${OVERSAMPLE} MAX_TOK=${MAX_TOK} SGLANG_MEM=${SGLANG_MEM}"
-echo "每步 rollout 上限约 OVERSAMPLE*N_SAMPLES=$((OVERSAMPLE * N_SAMPLES)) 条;如果还 OOM,先降 RESP_LEN/MAX_TOK/OVERSAMPLE。"
 sed -i -E 's/--num-gpus 8/--num-gpus 1/' "$RLVE_SH"
 sed -i -E 's/--actor-num-gpus-per-node 8/--actor-num-gpus-per-node 1/' "$RLVE_SH"
 sed -i -E 's/--context-parallel-size 8/--context-parallel-size 1/' "$RLVE_SH"
@@ -76,7 +55,6 @@ sed -i -E "s/--rollout-batch-size 128/--rollout-batch-size ${ROLLOUT_BSZ}/" "$RL
 sed -i -E "s/--n-samples-per-prompt 16/--n-samples-per-prompt ${N_SAMPLES}/" "$RLVE_SH"
 sed -i -E "s/--over-sampling-batch-size 384/--over-sampling-batch-size ${OVERSAMPLE}/" "$RLVE_SH"
 sed -i -E "s/--max-tokens-per-gpu 3072/--max-tokens-per-gpu ${MAX_TOK}/" "$RLVE_SH"
-sed -i -E "s/--sglang-mem-fraction-static 0\.[0-9]+/--sglang-mem-fraction-static ${SGLANG_MEM}/" "$RLVE_SH"
 # 时长控制:总步数 / 存档 / 评测间隔
 sed -i -E "s/--num-rollout 1000000/--num-rollout ${MAX_STEPS}/" "$RLVE_SH"
 sed -i -E "s/--save-interval 1/--save-interval ${SAVE_EVERY}/" "$RLVE_SH"
@@ -107,7 +85,7 @@ if [ -n "$EXTRA" ]; then
 fi
 
 echo "== 核对关键改动 =="
-grep -nE "num-gpus|actor-num-gpus-per-node|context-parallel-size|hf-checkpoint|ref-load|initial-difficulty|rollout-max-response-len|rollout-batch-size|n-samples-per-prompt|over-sampling-batch-size|max-tokens-per-gpu|sglang-mem-fraction-static" "$RLVE_SH"
+grep -nE "num-gpus|actor-num-gpus-per-node|context-parallel-size|hf-checkpoint|ref-load|initial-difficulty|rollout-max-response-len|n-samples-per-prompt" "$RLVE_SH" | head -20
 echo "ARM=$ARM  NUM_ENV=$NUM_ENV  DIFFICULTY_MODE=${DIFFICULTY_MODE:-<unset>}  STATIC_D=${STATIC_D}"
 
 echo "== 启动 num-environment=${NUM_ENV} =="
