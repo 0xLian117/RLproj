@@ -55,9 +55,23 @@ bash scripts/evaluation/Nemotron-Research-Reasoning-Qwen-1.5B-v2/eval_HELD-OUT_E
 ```
 
 ## 5. 之后:把自由能放进 RLVE(创新点)
-RLVE 里:
+创新算法已实现为 **`freeenergy_controller.py`**(本目录,纯 Python、无 SLIME/torch 依赖、可单测):
+给定各难度的成功率估计,按 `q(d) ∝ exp(U(d)/T)` 采样下一批难度,`U(d)=1−p^G−(1−p)^G`。
+`T→0` 时退化回 RLVE 的固定升难点(已在脚本 self-check 验证)。
+
+接入点(RLVE 官方 + SLIME 后端):
 - **每环境难度**:`Gym/parameter_controllers/<env>/parameter_controller.py`,`update()`=难度+1,`get_parameter_list()`=当前难度的参数集;
-- **自适应升难调度**(论文里维护难度区间 `[ℓ,h]`、按成功率升难)在 **SLIME rollout 侧**(`slime/rollout/` 内,`rlve_rm.py` 只是 verifier);
-- **自由能改点**:在那段"用各难度成功率决定下一批出多难"的调度逻辑里,把"acc≥0.9 升一档"换成"按 q(d)∝exp(U(d)/T) 采样难度"(见 `../scaler_addon/freeenergy_difficulty.py` 的核心算法,可移植)。
+- **自适应升难调度**(论文里维护难度区间 `[ℓ,h]`、按成功率升难)在 **SLIME rollout 侧**(`slime/rollout/`,`rlve_rm.py` 只是 verifier);
+- **改法**:在那段"用各难度成功率决定下一批出多难"的逻辑里:
+  1. 维护每(环境,难度)的成功率 EMA → 喂给 `FreeEnergyController.update({d: success})`;
+  2. 用 `FreeEnergyController.sample_difficulties(n)` 决定下一批难度,替换"acc≥0.9 升一档";
+  3. 驱动各环境的 `ParameterController` 到采样到的难度。
+```python
+from freeenergy_controller import FreeEnergyController
+fe = FreeEnergyController(d_min=0, d_max=20, G=8)   # G = n-samples-per-prompt
+ds = fe.sample_difficulties(batch)                  # 本步要出的难度
+# rollout + 判分后:
+fe.update({d: observed_success_rate[d] for d in set(ds)})
+```
 
 先把 §0–§4 的原始复现跑通,再做 §5。

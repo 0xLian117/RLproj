@@ -48,8 +48,11 @@ target; we use `p* = 0.5` for the binary-correctness reward.
 
 Appendix A shows the per-difficulty learning utility is the informative-group
 probability `U(d) = 1 − p(d)^G − (1−p(d))^G` (equivalently the expected reward
-variance), peaked where `p(d)=0.5`. SCALER regulates `d` to that single set-point.
-We instead choose a *distribution* over difficulty levels.
+variance), peaked where `p(d)=0.5`. RLVE instead raises difficulty only once
+accuracy at the upper bound exceeds `τ_acc=0.9` (a one-directional bump), so it
+operates the model near `p≈0.9`, where `U(0.9) ≈ 0.57 ≪ U(0.5) ≈ 0.99` (G=8) —
+i.e. in a low-signal regime. We instead choose a *distribution* over difficulty
+levels that targets the high-utility band.
 
 ### B.1 Objective
 Over the discrete difficulty levels `d ∈ {d_min,…,d_max}` (optionally over
@@ -66,8 +69,9 @@ Minimizing `F` under `Σ_d q(d)=1` (Lagrange multiplier) gives the Boltzmann for
 q*(d) ∝ exp( U(d) / T ),      F[q*] = −T · log Σ_d exp(U(d)/T).
 ```
 Limits:
-* `T → 0`  ⇒ `q*` concentrates on `argmax_d U(d)` (≈ the `p=0.5` level) — **this
-  recovers SCALER's set-point as a special case**;
+* `T → 0`  ⇒ `q*` concentrates on `argmax_d U(d)` (≈ the `p=0.5` level) — a hard
+  fixed set-point controller, but at the **signal-optimal 0.5** rather than RLVE's
+  `0.9` bump target;
 * `T → ∞` ⇒ `q*` → uniform (maximum exploration / difficulty diversity);
 * intermediate `T` interpolates, and automatically down-weights saturated
   (`p→1`) and hopeless (`p→0`) levels because their `U` is small.
@@ -82,4 +86,4 @@ out of one objective with a single knob `T`.
 ### B.4 Online estimation
 `p(d)` is unknown, so we keep an EMA estimate `p̂(d)` from observed group success
 rates, recompute `U(d)`, sample the next difficulties from `q*`, and anneal
-`T: T_0 → T_min`. This is the controller in `scaler_addon/freeenergy_difficulty.py`.
+`T: T_0 → T_min`. This is the controller in `rlve_repro/freeenergy_controller.py`.
