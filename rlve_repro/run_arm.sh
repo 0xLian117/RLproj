@@ -61,8 +61,9 @@ echo "== [2] 指向你的模型 =="
 # 用 # 作分隔符,免去路径里 / 的转义;先换更长的 ref-load(_torch_dist),再换 hf-checkpoint
 sed -i -E "s#--ref-load \.\./${MODELDIR}_torch_dist#--ref-load ${MODEL_DIST}#" "$RLVE_SH"
 sed -i -E "s#--hf-checkpoint \.\./${MODELDIR}#--hf-checkpoint ${MODEL_HF}#" "$RLVE_SH"
-# --save / --load 改到大盘(SAVE_ROOT 烤成绝对路径,${RUN_NAME} 留给 rlve.sh 运行时展开)
-sed -i "s#\.\./\${RUN_NAME}/#${SAVE_ROOT}/\${RUN_NAME}/#g" "$RLVE_SH"
+# --save / --load 改到大盘,且每个 ARM 独立目录(否则各臂写死同名目录→串档/resume 冲突)
+# SAVE_ROOT 与 ARM 在 run_arm.sh 里展开(烤成绝对路径),${RUN_NAME} 留给 rlve.sh 运行时展开
+sed -i "s#\.\./\${RUN_NAME}/#${SAVE_ROOT}/\${RUN_NAME}_${ARM}/#g" "$RLVE_SH"
 
 # 没设 WANDB_API_KEY 时给个占位,避免 --wandb-key 传空报错(配合 WANDB_MODE=offline)
 sed -i 's/--wandb-key "${WANDB_API_KEY}"/--wandb-key "${WANDB_API_KEY:-offline}"/' "$RLVE_SH"
