@@ -24,6 +24,11 @@ MAX_TOK=${MAX_TOK:-8192}
 # 你的模型路径
 MODEL_HF=${MODEL_HF:-/inspire/hdd/global_user/chenglian-253104020001/models/Nemotron-Research-Reasoning-Qwen-1.5B-v2}
 MODEL_DIST=${MODEL_DIST:-${MODEL_HF}_torch_dist}
+# checkpoint 存大盘(别写 ../,会落在 /root 撑爆);wandb 离线
+SAVE_ROOT=${SAVE_ROOT:-/inspire/hdd/global_user/chenglian-253104020001/rlve_ckpts}
+export WANDB_MODE=${WANDB_MODE:-offline}
+export WANDB_API_KEY=${WANDB_API_KEY:-offline}
+mkdir -p "$SAVE_ROOT"
 
 MODELDIR=Nemotron-Research-Reasoning-Qwen-1.5B-v2
 RLVE_SH=scripts/training/${MODELDIR}/rlve.sh
@@ -46,6 +51,11 @@ echo "== [2] 指向你的模型 =="
 # 用 # 作分隔符,免去路径里 / 的转义;先换更长的 ref-load(_torch_dist),再换 hf-checkpoint
 sed -i -E "s#--ref-load \.\./${MODELDIR}_torch_dist#--ref-load ${MODEL_DIST}#" "$RLVE_SH"
 sed -i -E "s#--hf-checkpoint \.\./${MODELDIR}#--hf-checkpoint ${MODEL_HF}#" "$RLVE_SH"
+# --save / --load 改到大盘(SAVE_ROOT 烤成绝对路径,${RUN_NAME} 留给 rlve.sh 运行时展开)
+sed -i "s#\.\./\${RUN_NAME}/#${SAVE_ROOT}/\${RUN_NAME}/#g" "$RLVE_SH"
+
+# 没设 WANDB_API_KEY 时给个占位,避免 --wandb-key 传空报错(配合 WANDB_MODE=offline)
+sed -i 's/--wandb-key "${WANDB_API_KEY}"/--wandb-key "${WANDB_API_KEY:-offline}"/' "$RLVE_SH"
 
 echo "== [3] 按 ARM 设难度策略 =="
 case "$ARM" in
