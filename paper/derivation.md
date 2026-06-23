@@ -41,3 +41,45 @@ tracks `p* = 0.5`, which is exactly the band that maximizes both quantities
 above. For non-binary/shaped rewards the optimum shifts away from 0.5 (it
 maximizes `Var[r]` under the reward distribution), and `p*` becomes a tunable
 target; we use `p* = 0.5` for the binary-correctness reward.
+
+---
+
+# Appendix B — free-energy formulation of difficulty control
+
+Appendix A shows the per-difficulty learning utility is the informative-group
+probability `U(d) = 1 − p(d)^G − (1−p(d))^G` (equivalently the expected reward
+variance), peaked where `p(d)=0.5`. SCALER regulates `d` to that single set-point.
+We instead choose a *distribution* over difficulty levels.
+
+### B.1 Objective
+Over the discrete difficulty levels `d ∈ {d_min,…,d_max}` (optionally over
+environments too), pick a sampling distribution `q` minimizing the **free energy**
+```
+F[q] = − E_{d∼q}[U(d)]  −  T · H[q],     H[q] = −Σ_d q(d) log q(d).
+```
+Energy `−U` favors informative levels; the entropy term (weight = temperature `T`)
+favors spread/diversity.
+
+### B.2 Optimal policy = Gibbs distribution
+Minimizing `F` under `Σ_d q(d)=1` (Lagrange multiplier) gives the Boltzmann form
+```
+q*(d) ∝ exp( U(d) / T ),      F[q*] = −T · log Σ_d exp(U(d)/T).
+```
+Limits:
+* `T → 0`  ⇒ `q*` concentrates on `argmax_d U(d)` (≈ the `p=0.5` level) — **this
+  recovers SCALER's set-point as a special case**;
+* `T → ∞` ⇒ `q*` → uniform (maximum exploration / difficulty diversity);
+* intermediate `T` interpolates, and automatically down-weights saturated
+  (`p→1`) and hopeless (`p→0`) levels because their `U` is small.
+
+### B.3 Unifying environment curation
+With a joint utility `U(e,d)` the same derivation gives
+`q*(e,d) ∝ exp(U(e,d)/T)`, whose marginal `q*(e) ∝ Σ_d exp(U(e,d)/T)` is an
+environment-selection weight — the negative free energy `T·logΣ_d exp(U(e,d)/T)`.
+Thus *intra-environment difficulty control* and *cross-environment curation* drop
+out of one objective with a single knob `T`.
+
+### B.4 Online estimation
+`p(d)` is unknown, so we keep an EMA estimate `p̂(d)` from observed group success
+rates, recompute `U(d)`, sample the next difficulties from `q*`, and anneal
+`T: T_0 → T_min`. This is the controller in `scaler_addon/freeenergy_difficulty.py`.

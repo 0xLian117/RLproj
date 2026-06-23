@@ -1,49 +1,44 @@
-# Poster outline (for `poster模板.pptx`, June 30 2026 session)
+# Poster outline (for `poster模板.pptx`, June 30 2026)
 
-A poster is read in 60 seconds — one bold claim, one equation, two figures.
+Read in 60 seconds: one claim, one equation, two figures.
 
 ## Title bar
-**Targeting the Learning Signal: Adaptive Difficulty as Closed-Loop Control of
-Reward Variance in RL for LMs** · 〈names〉 · RLVE-lite
+**Free-Energy Difficulty Control for RL on Verifiable Environments** ·
+〈names〉 · generalizing SCALER's success set-point
 
 ## Panel 1 — Motivation (top-left)
-- Cartoon: easy box (✓✓✓✓ → flat, no gradient) | hard box (✗✗✗✗ → no gradient) |
-  middle box (✓✓✗✗ → gradient!).
-- One line: *"RL doesn't just need more problems — it needs problems at the
-  difficulty that keeps producing a learning signal."*
+Cartoon: easy box (✓✓✓✓ → flat, no gradient) | hard box (✗✗✗✗ → no gradient) |
+mid box (✓✓✗✗ → gradient!). Line: *RL needs a sustained supply of mid-difficulty
+signal, not just more data.*
 
-## Panel 2 — Key insight (the equation, center-top, make it big)
-- `Signal ∝ within-group reward variance = p(1−p)`, maximal at **p* = 0.5**.
-- `P(informative group) = 1 − pᴳ − (1−p)ᴳ`, also peaks at 0.5.
-- Small plot of `p(1−p)` and `P_inf` for G=8 (mark the peak at 0.5).
-- Punchline: *RLVE waits for 90% accuracy to raise difficulty — we target 50%,
-  the signal-maximizing band.*
+## Panel 2 — Key idea (center-top, make the equation big)
+- Group learning signal `∝ p(1−p)`; informative-group prob `U(d)=1−pᴳ−(1−p)ᴳ`,
+  peak at `p=0.5` (plot for G=8).
+- Don't pick one set-point — minimize **free energy** `F[q]=−E_q[U]−T·H[q]`
+  ⇒ **`q(d) ∝ exp(U(d)/T)`**.
+- Punchline: *SCALER's 0.5 set-point = the `T→0` limit of our objective.*
 
 ## Panel 3 — Method (left-center)
-- **STAD** controller (one box): `μ ← clip(μ + k_p(s̄ − p*))`, bidirectional
-  (↑ if too easy, ↓ if too hard). vs RLVE's one-way "bump at 0.9".
-- **Learning-progress sampler** (one box): softmax bandit over each env's
-  effective sample ratio + uniform floor.
-- Diagram: generate → verify (✓/✗) → measure success → adjust difficulty (loop).
+- Free-energy controller: EMA `p̂(d)` → `U(d)` → sample `q∝exp(U/T)` → anneal `T`.
+- `T→0` exploit (≈SCALER) · `T→∞` explore (diverse) · same objective also gives an
+  environment-curation weight (negative free energy).
+- Diagram: generate → verify (SandboxFusion ✓/✗) → estimate U → sample difficulty (loop).
 
 ## Panel 4 — Setup (small, left-bottom)
-- 8 verifiable envs (5 train / 3 held-out), Qwen2.5-1.5B-Instruct, GRPO,
-  single GPU (TRL+vLLM). 4 conditions: static / RLVE-threshold / STAD / STAD+LP.
+SCALER verifiable envs (5 train / 3 held-out), Qwen2.5-3B-Instruct, GRPO, single GPU.
+Arms: static-lo/mid/hi · SCALER-adaptive · **free-energy (ours)**.
 
-## Panel 5 — Results (right half, the biggest panels)
-- **Fig A:** effective sample ratio vs steps — STAD stays high, threshold/static
-  decay (`results/figures/training_dynamics.png`).
-- **Fig B:** held-out accuracy bars, base vs 4 conditions
-  (`results/figures/eval_accuracy.png`).
-- Headline number box: *"STAD: +〈X〉% held-out vs RLVE bump, +〈Y〉% vs static, at
-  equal compute."*
-- Synthetic-study mini-table (mechanism): STAD ≈2× learned ability, ESR 0.97 vs
-  0.55.
+## Panel 5 — Results (right half, biggest)
+- **Fig A**: effective sample ratio vs step — static collapses, adaptive holds,
+  free-energy 〈highest〉 (`results/figures/effective_sample_ratio.png`).
+- **Fig B**: held-out accuracy, base vs arms (bars).
+- Headline box: *free-energy 〈+X%〉 held-out vs static, 〈+Y%〉 vs SCALER set-point,
+  equal compute.*
 
 ## Panel 6 — Takeaways (bottom-right)
-1. "适中难度" = a control target, not a heuristic: hold success at p*≈0.5.
-2. Bidirectional > one-way bump; targets signal, not proficiency.
-3. Honest: the env sampler helps weak controllers but is redundant once STAD
-   equalizes signal; pushing difficulty to the ceiling motivates env scaling.
+1. Difficulty = a free-energy control target, not a hand-set 0.5.
+2. One temperature knob unifies exploit/explore and difficulty/environment.
+3. SCALER is recovered at `T→0`; honest limit — when the model outgrows `d_max`,
+   signal collapses → need environment scaling.
 
-Footer: arXiv:2511.07317 (RLVE baseline) · code: github.com/0xLian117/RLproj
+Footer: SCALER arXiv:2601.04809 · RLVE arXiv:2511.07317 · code: github.com/0xLian117/RLproj
