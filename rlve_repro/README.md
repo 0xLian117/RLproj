@@ -54,24 +54,36 @@ bash scripts/evaluation/Nemotron-Research-Reasoning-Qwen-1.5B-v2/eval_BENCHMARKS
 bash scripts/evaluation/Nemotron-Research-Reasoning-Qwen-1.5B-v2/eval_HELD-OUT_ENVIRONMENTS.sh <ckpt>
 ```
 
-## 5. 之后:把自由能放进 RLVE(创新点)
-创新算法已实现为 **`freeenergy_controller.py`**(本目录,纯 Python、无 SLIME/torch 依赖、可单测):
-给定各难度的成功率估计,按 `q(d) ∝ exp(U(d)/T)` 采样下一批难度,`U(d)=1−p^G−(1−p)^G`。
-`T→0` 时退化回 RLVE 的固定升难点(已在脚本 self-check 验证)。
+## 5. 创新点:自由能难度控制器(已对真实 RLVE 代码实现)
+RLVE 的难度调度全在 **`slime/ray/rollout_data_source.py` 的 `RLVEManager`**:
+`generate_problem()` 选难度、`update()` 按 acc≥0.9 升难(只升不降)。我们的创新是把它
+换成按 **Gibbs 分布 `q(d)∝exp(U(d)/T)`** 采样难度的控制器(`U(d)=1−p^G−(1−p)^G`,0.5 处最大),
+可升可降、对准信号最优带。
 
-接入点(RLVE 官方 + SLIME 后端):
-- **每环境难度**:`Gym/parameter_controllers/<env>/parameter_controller.py`,`update()`=难度+1,`get_parameter_list()`=当前难度的参数集;
-- **自适应升难调度**(论文里维护难度区间 `[ℓ,h]`、按成功率升难)在 **SLIME rollout 侧**(`slime/rollout/`,`rlve_rm.py` 只是 verifier);
-- **改法**:在那段"用各难度成功率决定下一批出多难"的逻辑里:
-  1. 维护每(环境,难度)的成功率 EMA → 喂给 `FreeEnergyController.update({d: success})`;
-  2. 用 `FreeEnergyController.sample_difficulties(n)` 决定下一批难度,替换"acc≥0.9 升一档";
-  3. 驱动各环境的 `ParameterController` 到采样到的难度。
-```python
-from freeenergy_controller import FreeEnergyController
-fe = FreeEnergyController(d_min=0, d_max=20, G=8)   # G = n-samples-per-prompt
-ds = fe.sample_difficulties(batch)                  # 本步要出的难度
-# rollout + 判分后:
-fe.update({d: observed_success_rate[d] for d in set(ds)})
+本目录文件:
+- `freeenergy_manager.py` — `FreeEnergyRLVEManager(RLVEManager)`,只重写 `generate_problem()`/`update()`
+  (按真实 RLVE 接口:`Sample.metadata{environment,problem_difficulty}`、`reward["accuracy"]`、
+  `ParameterController.update()/get_parameter_list()`),对真实代码已离线验证逻辑正确。
+- `apply_patch.py` — 把上面的 manager 拷进 RLVE 根目录,并在 `RLVEManager` 实例化处加一个
+  env 变量开关:`DIFFICULTY_MODE=freeenergy` 时用我们的 manager,否则原样 RLVE(幂等)。
+- `freeenergy_controller.py` — 同算法的独立纯 Python 版(便于单测/讲解)。
+
+接入(一次):
+```bash
+# 在 RLVE 仓库根目录
+python /path/to/rlve_repro/apply_patch.py --rlve "$PWD"
+# 之后:DIFFICULTY_MODE=freeenergy 那一臂才用自由能,不设则逐字保持 RLVE 原行为
+```
+超参经 env 变量:`FE_DMAX(16) FE_G(=n_samples_per_prompt) FE_T0(0.6) FE_TMIN(0.1) FE_ANNEAL(60) FE_EMA(0.7)`。
+
+## 6. 实验怎么跑
+见 **`EXPERIMENT_PLAN.md`**:A 组(环境 scaling 复现)+ B 组(static / RLVE / free-energy 三臂对照)。
+用 `run_arm.sh`(本目录,已指向你的模型路径):
+```bash
+ARM=adaptive   NUM_ENV=1  bash run_arm.sh RLVE     # 先跑通最小臂
+ARM=adaptive   NUM_ENV=16 bash run_arm.sh RLVE     # RLVE 基线
+ARM=static     NUM_ENV=16 STATIC_D=4 bash run_arm.sh RLVE
+ARM=freeenergy NUM_ENV=16 bash run_arm.sh RLVE     # 需先 apply_patch.py
 ```
 
-先把 §0–§4 的原始复现跑通,再做 §5。
+先把 §0–§4 原始复现(A1)跑通,再做 §5–§6。
