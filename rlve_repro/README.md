@@ -38,14 +38,22 @@ PYTHONPATH=/root/Megatron-LM python tools/convert_hf_to_torch_dist.py \
 ```bash
 # 在 RLVE 仓库根目录
 cp /path/to/run_prorl_1gpu.sh .
-NUM_ENV=1 RESP_LEN=8192 ROLLOUT_BSZ=32 N_SAMPLES=8 bash run_prorl_1gpu.sh RLVE
+NUM_ENV=1 bash run_prorl_1gpu.sh RLVE
 ```
 脚本做的事:`ray --num-gpus 8→1`、`actor-num-gpus-per-node 8→1`、
 `context-parallel-size 8→1`、缩短 `rollout-max-response-len`/`rollout-batch-size`/
-`n-samples-per-prompt`,然后跑 `num-environment=1`(最小臂,仅 `Multiplication` 环境)。
+`n-samples-per-prompt`、`over-sampling-batch-size`、`max-tokens-per-gpu`,并降低
+`sglang-mem-fraction-static`,然后跑 `num-environment=1`(最小臂,仅 `Multiplication` 环境)。
 跑通后逐步放大:`NUM_ENV=4 / 16 / 256 / 400`。
 
-OOM 就调小:`RESP_LEN=4096`、`ROLLOUT_BSZ=16`、`MAX_TOK=4096`。
+如果看到 `ActorDiedError` / `Worker unexpectedly exits` / `SIGKILL`,优先当作
+CPU/GPU OOM 处理。单卡先用脚本默认的保守配置:
+`RESP_LEN=4096 ROLLOUT_BSZ=8 N_SAMPLES=4 OVERSAMPLE=8 MAX_TOK=4096 SGLANG_MEM=0.4`。
+仍然 OOM 就继续降:`RESP_LEN=2048`、`MAX_TOK=2048`、`OVERSAMPLE=4`。
+稳定后再放大,例如:
+```bash
+NUM_ENV=1 RESP_LEN=8192 ROLLOUT_BSZ=16 N_SAMPLES=8 OVERSAMPLE=8 MAX_TOK=4096 bash run_prorl_1gpu.sh RLVE
+```
 
 ## 4. 评测(复现 RLVE 的泛化结论)
 ```bash
@@ -87,5 +95,7 @@ ARM=static   NUM_ENV=16 STATIC_D=4 bash run_arm.sh RLVE  # Static
 ARM=signal   NUM_ENV=16 bash run_arm.sh RLVE             # Signal-RLVE 消融(先 apply_patch)
 ARM=fep      NUM_ENV=16 bash run_arm.sh RLVE             # FEP-RLVE(我们)
 ```
+`run_arm.sh` 默认也走保守单卡配置;稳定后可显式提高 `RESP_LEN`、`MAX_TOK`、
+`OVERSAMPLE`、`ROLLOUT_BSZ` 做正式长跑。
 
 先把 §0–§4 原始复现(`ARM=adaptive NUM_ENV=1`)跑通,再做 §5–§6。
