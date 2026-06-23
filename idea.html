@@ -176,9 +176,19 @@
     <li><strong>泛化</strong>:训练前后在 held-out 环境 + 公开 benchmark 上的提升,主张 FEP ≥ Signal &gt; RLVE-90 &gt; Static。</li>
   </ul>
   <div class="box">
-    <div class="lab">目前进展(已验证)</div>
-    控制器已离线验证:<code>U<sub>K</sub></code> 与信息增益都在 p≈0.5 峰值;能力信念能跟踪上升的能力,标准差从 1.2 收缩到 0.06(即先探索后利用)。
-    RLVE 复现已在 ProRL-1.5B-v2 上正常训练(约 40 秒/步,平均组奖励约 0.41)。〈四臂完整曲线与泛化数据,待训练日志回填。〉
+    <div class="lab">实验结果(ProRL-1.5B-v2,4 环境,各 30 步,单卡 H200)</div>
+    <table style="margin-top:4px">
+      <thead><tr><th>臂</th><th>平均成功率 p</th><th>平均有效样本率 U<sub>K</sub></th></tr></thead>
+      <tbody>
+        <tr><td>RLVE-90(acc≥0.9 基线)</td><td>0.580</td><td>0.962</td></tr>
+        <tr><td>Signal-RLVE(λ<sub>info</sub>=0)</td><td>0.461</td><td>0.974</td></tr>
+        <tr class="ours"><td>FEP-RLVE(本工作)</td><td>0.444</td><td>0.970</td></tr>
+      </tbody>
+    </table>
+    <p style="margin:8px 0 0">核心现象(见成功率曲线):<strong>RLVE-90 早期把成功率推到 0.7–0.83</strong>(太易、低信号区),
+    而 <span class="hot">FEP / Signal 全程贴着 0.5 信号最优带</span> —— 验证了「对准 0.5 比停在 0.9 更优」。
+    在这一小规模(4 个较易环境、30 步)下三者有效样本率都高(0.96–0.97),差异温和;
+    更大环境/更多步数下分化预期更明显。控制器另已离线验证:<code>U<sub>K</sub></code> 与信息增益都在 p≈0.5 峰值,能力信念 σ 从 1.2 收缩到 0.06(explore→exploit)。</p>
   </div>
 
   <!-- 7 -->
