@@ -1,268 +1,224 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>FEP-RLVE — Expected-Free-Energy Difficulty Selection</title>
+<title>FEP-RLVE:用自由能原理选择训练难度</title>
 <style>
   :root{
-    --ink:#111; --mut:#555; --rule:#d9d9d9; --acc:#7a1f1f; --paper:#fff; --bg:#eceae5;
-    --serif:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,"Times New Roman",serif;
+    --ink:#15181f; --mut:#5a5f6b; --rule:#dcdcdc; --acc:#8a1f1f; --acc2:#2c6e8f;
+    --paper:#fff; --bg:#ecebe7;
+    --serif:"Songti SC","SimSun","Noto Serif CJK SC",Georgia,"Times New Roman",serif;
+    --sans:"PingFang SC","Microsoft YaHei","Hiragino Sans GB",system-ui,sans-serif;
     --mono:"SF Mono",ui-monospace,Menlo,Consolas,monospace;
   }
-  *{box-sizing:border-box}
-  body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--serif);
-    font-size:16px;line-height:1.5;-webkit-font-smoothing:antialiased}
-  .paper{max-width:820px;margin:28px auto;background:var(--paper);
-    padding:56px 64px 64px;box-shadow:0 1px 4px rgba(0,0,0,.12)}
-  /* title block */
-  .title{font-size:25px;line-height:1.25;font-weight:700;text-align:center;margin:0 0 6px;letter-spacing:-.01em}
-  .subtitle{text-align:center;color:var(--mut);font-style:italic;margin:0 0 16px}
-  .authors{text-align:center;font-size:14.5px;margin:0 0 4px}
-  .affil{text-align:center;font-size:12.5px;color:var(--mut);margin:0 0 22px}
-  /* abstract */
-  .abstract{margin:0 0 26px;padding:0 26px}
-  .abstract h3{font-variant:small-caps;letter-spacing:.06em;font-size:14px;text-align:center;margin:0 0 6px}
-  .abstract p{font-size:14.5px;line-height:1.55;margin:0;text-align:justify}
-  /* sections */
-  h2{font-size:16.5px;margin:26px 0 7px;padding-bottom:2px;border-bottom:1px solid var(--rule)}
-  h2 .n{color:var(--acc);font-family:var(--mono);font-size:14px;margin-right:8px}
-  h3.sub{font-size:14.5px;font-style:italic;color:#333;margin:14px 0 4px;border:none}
-  p{margin:9px 0;text-align:justify}
-  .col2{column-count:1}
-  ul{margin:8px 0;padding-left:22px} li{margin:4px 0;text-align:justify}
-  code{font-family:var(--mono);font-size:13px}
-  /* equation */
-  .eq{font-family:var(--mono);font-size:13.5px;text-align:center;margin:14px 0;
-    padding:10px 12px;background:#faf9f7;border:1px solid var(--rule);border-radius:3px;overflow-x:auto}
-  .eqn{float:right;color:var(--mut)}
-  /* figure */
-  figure{margin:18px 0;text-align:center}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--ink);font-family:var(--sans);
+    font-size:16px;line-height:1.8;-webkit-font-smoothing:antialiased}
+  .paper{max-width:840px;margin:30px auto;background:var(--paper);
+    padding:54px 64px 70px;box-shadow:0 1px 5px rgba(0,0,0,.12)}
+  .title{font-size:27px;line-height:1.32;font-weight:800;text-align:center;margin:0 0 8px;letter-spacing:-.01em}
+  .title .em{color:var(--acc)}
+  .subtitle{text-align:center;color:var(--mut);margin:0 0 6px;font-size:16px}
+  .meta{text-align:center;font-family:var(--mono);font-size:12.5px;color:var(--mut);margin:0 0 30px}
+  h2{font-size:19px;font-weight:800;margin:34px 0 10px;padding-bottom:5px;border-bottom:2px solid var(--rule)}
+  h2 .n{color:var(--acc);font-family:var(--mono);font-size:16px;margin-right:9px}
+  h3{font-size:16px;font-weight:700;color:#2a2a2a;margin:18px 0 6px}
+  p{margin:11px 0;text-align:justify}
+  ul{margin:9px 0;padding-left:24px} li{margin:6px 0;text-align:justify}
+  b,strong{color:#000}
+  .hot{color:var(--acc);font-weight:bold} .cool{color:var(--acc2);font-weight:bold}
+  code{font-family:var(--mono);font-size:13.5px;background:#f4f3f0;padding:0 3px;border-radius:3px}
+  .eq{font-family:var(--mono);font-size:15px;text-align:center;margin:16px 0;
+    padding:13px 14px;background:#faf8f5;border:1px solid var(--rule);border-left:4px solid var(--acc);
+    border-radius:4px;overflow-x:auto;line-height:1.7}
+  .eq.c{border-left-color:var(--acc2)}
+  .box{background:#f5f1ea;border:1px solid var(--rule);border-radius:6px;padding:16px 20px;margin:16px 0}
+  .box .lab{font-weight:800;color:var(--acc);margin-bottom:6px}
+  .box.cool{background:#eef3f6} .box.cool .lab{color:var(--acc2)}
+  table{width:100%;border-collapse:collapse;margin:14px 0;font-size:14.5px}
+  th,td{border-top:1px solid var(--ink);border-bottom:1px solid var(--rule);padding:8px 10px;text-align:left;vertical-align:top}
+  thead th{border-bottom:2px solid var(--ink);font-weight:800}
+  tr.ours td{background:#f8efe9} tr.ours td:first-child{color:var(--acc);font-weight:800}
+  figure{margin:20px 0;text-align:center}
   canvas{max-width:100%;height:auto;border:1px solid var(--rule);background:#fff}
-  figcaption{font-size:13px;color:var(--mut);margin-top:7px;text-align:left;padding:0 8px}
-  figcaption b{color:var(--ink)}
-  /* table */
-  table{width:100%;border-collapse:collapse;margin:14px 0;font-size:13.5px}
-  caption{caption-side:top;font-size:13px;color:var(--mut);text-align:left;margin-bottom:6px}
-  th,td{border-top:1px solid var(--ink);border-bottom:1px solid var(--rule);padding:6px 9px;text-align:left;vertical-align:top}
-  thead th{border-bottom:1.5px solid var(--ink)}
-  tr.hl td{background:#f7efe9}
-  /* refs */
-  .refs{font-size:12.5px;color:#333} .refs ol{padding-left:22px;margin:6px 0}
-  .refs li{margin:3px 0}
-  .meta-tag{font-family:var(--mono);font-size:11.5px;color:var(--mut);text-align:center;margin-top:4px}
-  @media (max-width:680px){ .paper{padding:32px 22px} .abstract{padding:0} }
+  figcaption{font-size:13px;color:var(--mut);margin-top:8px;text-align:left}
+  .note{font-size:13.5px;color:var(--mut)}
+  .foot{margin-top:30px;border-top:1px solid var(--rule);padding-top:12px;
+    font-family:var(--mono);font-size:12px;color:var(--mut);text-align:center}
+  @media(max-width:680px){.paper{padding:30px 20px}}
 </style>
 </head>
 <body>
 <div class="paper">
 
-  <div class="title">FEP-RLVE: Expected-Free-Energy Difficulty Selection<br>for Adaptive Verifiable Environments</div>
-  <div class="subtitle">Curriculum by inference, not by rule</div>
-  <div class="authors">〈Your Name〉</div>
-  <div class="affil">Course Project · RL for LLM Reasoning with Environment Scaling</div>
+  <div class="title">FEP-RLVE:用<span class="em">自由能原理</span>选择训练难度</div>
+  <div class="subtitle">把强化学习的「难度自适应」从一条写死的规则,变成一个可推导的决策目标</div>
+  <div class="meta">〈姓名 / 学号〉　·　课程项目:RL with Environment Scaling　·　基线 RLVE (arXiv:2511.07317)　·　模型 ProRL-1.5B-v2</div>
 
-  <div class="abstract">
-    <h3>Abstract</h3>
-    <p>Reinforcement learning for reasoning LLMs stalls when problem difficulty drifts off the
-    model's capability frontier: too-easy rollout groups are all-correct and too-hard groups
-    all-wrong, both yielding zero group-relative gradient. RLVE keeps problems solvable through
-    procedurally generated verifiable environments with adaptive difficulty, but uses a fixed
-    rule — raise difficulty once accuracy exceeds 0.9 — which parks the model in a low-signal
-    regime. We recast difficulty selection as <em>action selection under the Free Energy
-    Principle</em>: maintain a posterior over the model's latent competence per environment and
-    choose the difficulty that minimizes the Expected Free Energy (EFE), trading off the
-    pragmatic learning signal against the epistemic information gain about competence. The
-    resulting policy <code>&pi;(d) &prop; exp(&minus;G(d)/T)</code> targets the
-    variance-maximizing success band (p&nbsp;&asymp;&nbsp;0.5) while exploring when uncertain.
-    Reproducing RLVE from ProRL-1.5B-v2 on a single GPU, we compare static, RLVE-threshold,
-    a signal-only ablation, and the full FEP controller on training-time effective sample
-    ratio and held-out generalization.</p>
+  <!-- 0 一句话 -->
+  <div class="box">
+    <div class="lab">一句话总结</div>
+    我们在复现 RLVE 的基础上,把它「准确率超过 0.9 就把题目调难一档」这条<strong>人工规则</strong>,
+    替换成一套<strong>基于自由能原理(Free Energy Principle)的难度选择器</strong>:
+    它一边估计「模型现在到底有多强」,一边挑出<strong>最能产生学习信号、又最能减少这个估计不确定性</strong>的难度去训练。
   </div>
 
-  <h2><span class="n">1</span>Introduction</h2>
-  <p>RL post-training improves LLM reasoning, but progress slows when the training signal
-  vanishes. For group-relative methods (GRPO/DAPO), a prompt is informative only if its group
-  of <code>K</code> rollouts is non-degenerate; an all-correct or all-wrong group has zero
-  within-group reward variance and contributes no gradient. The probability a binary-reward
-  group is informative is <code>U<sub>K</sub>(p)=1&minus;p<sup>K</sup>&minus;(1&minus;p)<sup>K</sup></code>,
-  maximized at success rate <code>p=0.5</code>. Keeping the model near this band is therefore
-  the central objective of adaptive-difficulty training.</p>
-  <p>RLVE [1] supplies this via RLVE-Gym, 400 hand-engineered verifiable environments that
-  generate unbounded instances with algorithmic verifiers and a difficulty knob <code>d</code>.
-  Its controller, however, is a one-directional heuristic: per environment it raises the
-  difficulty upper bound once accuracy at that bound exceeds <code>&tau;<sub>acc</sub>=0.9</code>.
-  This operates the model near <code>p&asymp;0.9</code>, where <code>U<sub>K</sub>(0.9)&asymp;0.57 &Lt; U<sub>K</sub>(0.5)&asymp;0.99</code>
-  (K=8) — most groups are wasted — and it never lowers difficulty, has no explicit objective,
-  and no exploration term.</p>
-  <p><b>Contributions.</b> (i) We formalize difficulty selection as Expected-Free-Energy
-  minimization and show RLVE's 0.9 rule is a low-signal operating point (&sect;3, Fig.&nbsp;1).
-  (ii) We give an online, belief-based controller — a drop-in for RLVE's difficulty scheduler —
-  with closed-form pragmatic and epistemic terms (&sect;3). (iii) We design a four-arm
-  comparison, isolating the epistemic (FEP) contribution via a signal-only ablation (&sect;4).</p>
-
-  <h2><span class="n">2</span>Background</h2>
-  <h3 class="sub">2.1 Verifiable environments and GRPO/DAPO</h3>
-  <p>An RLVE environment is a program with a procedural generator, an algorithmic verifier, and
-  an integer difficulty <code>d&ge;0</code>. Training draws a batch of prompts, samples
-  <code>K</code> rollouts each, and updates the policy with group-relative advantages; DAPO
-  discards zero-variance groups via dynamic sampling, so the <em>effective</em> rollouts are
-  exactly those in informative groups.</p>
-  <h3 class="sub">2.2 RLVE's adaptive-difficulty rule</h3>
-  <p>Per environment, RLVE keeps a range <code>[&ell;,h]</code>, samples
-  <code>d&sim;Uniform(&ell;,h)</code>, tracks accuracy <code>a/b</code> at the upper bound
-  <code>h</code>, and sets <code>h&larr;h+1</code> once <code>b&ge;&tau;<sub>num</sub></code> and
-  <code>a/b&ge;0.9</code> (sliding window <code>d<sub>&Delta;</sub>=4</code>). The update is
-  one-directional and rule-based.</p>
-
-  <h2><span class="n">3</span>Method: FEP-RLVE</h2>
-  <p>We treat "which difficulty to train on" as an action chosen to minimize Expected Free
-  Energy. The correspondence to active inference [2,3]:</p>
-  <table>
-    <thead><tr><th>Active inference</th><th>Adaptive difficulty</th></tr></thead>
-    <tbody>
-    <tr><td>hidden state <code>s</code></td><td>model's latent competence in an environment</td></tr>
-    <tr><td>belief <code>q(s)</code></td><td>posterior over competence (with uncertainty)</td></tr>
-    <tr><td>observation <code>o</code></td><td>a rollout at difficulty <code>d</code> is correct / wrong</td></tr>
-    <tr><td>action <code>&pi;</code></td><td>which difficulty <code>d</code> to pose</td></tr>
-    <tr><td>EFE <code>G(d)</code></td><td>expected cost of posing <code>d</code> (signal + info + budget)</td></tr>
-    </tbody>
-  </table>
-  <h3 class="sub">3.1 Expected Free Energy and the policy</h3>
-  <p>For each candidate difficulty we score its EFE and sample by the standard active-inference
-  policy prior:</p>
-  <div class="eq">
-    G<sub>e</sub>(d) = &minus; &lambda;<sub>sig</sub>&middot;U<sub>K</sub>(p&#770;) &minus; &lambda;<sub>info</sub>&middot;I(s;o|d) + &lambda;<sub>cost</sub>&middot;C(d)<span class="eqn">(1)</span><br><br>
-    &pi;(d|e) &prop; exp( &minus; G<sub>e</sub>(d) / T )<span class="eqn">(2)</span>
+  <!-- 1 -->
+  <h2><span class="n">1</span>背景:我们在解决什么问题</h2>
+  <p>用强化学习(RL)训练大模型做推理,核心难点不是「缺题」,而是<strong>缺能持续产生学习信号的「适中难度」题目</strong>。
+  原因在于现在主流的 RL 算法(GRPO / DAPO)是<strong>按「一组」来更新</strong>的:对同一道题采 <code>K</code> 个回答(比如 K=8),
+  每个判对(1)或错(0),再用组内的相对好坏来更新模型。</p>
+  <div class="box">
+    <div class="lab">关键失效机制</div>
+    如果这一组 K 个回答<strong>全对</strong>或<strong>全错</strong>,组内没有差异 → 算出来的优势全为 0 →
+    <strong>这一组完全不产生梯度,算力白费</strong>。(DAPO 干脆把这种「零方差组」直接丢掉。)
   </div>
-  <p><b>Pragmatic value</b> is the effective prompt ratio
-  <code>U<sub>K</sub>(p)=1&minus;p<sup>K</sup>&minus;(1&minus;p)<sup>K</sup></code> (the DAPO
-  signal), maximal at <code>p=0.5</code>. <b>Epistemic value</b> is the expected information gain
-  about competence,</p>
-  <div class="eq">I(s;o|d) = H[q(s)] &minus; E<sub>o&sim;p(o|d)</sub> H[q(s|o,d)]<span class="eqn">(3)</span></div>
-  <p>which is largest at boundary difficulties that best discriminate competence — also near
-  <code>p&asymp;0.5</code>. Thus both terms point at the signal-optimal band by independent
-  arguments (Fig.&nbsp;1). The temperature <code>T</code> sets exploitation vs exploration:
-  <code>T&rarr;0</code> recovers a hard set-point at the optimal 0.5 (vs RLVE's 0.9),
-  <code>T&rarr;&infin;</code> a uniform difficulty distribution.</p>
-  <h3 class="sub">3.2 Competence belief and online control</h3>
-  <p>We model competence with an IRT-style likelihood <code>P(correct|s,d)=&sigma;(a(s&minus;d))</code>
-  on a grid, updated by Bayes after each rollout. Per step: (1) compute <code>G(d)</code> for
-  each level; (2) sample <code>d&sim;&pi;</code>, generate; (3) verify; (4) update <code>q(s)</code>.
-  When the belief is uncertain the epistemic term dominates and difficulty exploration widens;
-  once competence is localized the pragmatic term dominates — explore&rarr;exploit emerges
-  without hand-tuned annealing. Setting <code>&lambda;<sub>info</sub>=0</code> yields a
-  signal-only ablation (Signal-RLVE).</p>
+  <p>设模型在某难度的答对概率是 <code>p</code>。一组「有对有错、能用」的概率是</p>
+  <div class="eq">U<sub>K</sub>(p) = 1 − p<sup>K</sup> − (1−p)<sup>K</sup>　<span class="hot">在 p = 0.5 时最大</span></div>
+  <p>直观代入(K=8):太简单 <code>p=0.95</code> → 整组全对约 66%,大半白采;太难 <code>p=0.1</code> → 整组全错约 43%;
+  只有 <code>p=0.5</code> 时约 99% 的组都有效。<strong>结论:难度必须维持在「模型刚好对一半」的地方,信号才最强。</strong></p>
+
+  <!-- 2 -->
+  <h2><span class="n">2</span>以往的方法(RLVE)及其问题</h2>
+  <h3>RLVE 怎么做</h3>
+  <p><strong>RLVE</strong>(我们复现的基线工作)手工设计了 400 个<strong>可验证环境</strong>(RLVE-Gym):每个环境是一段程序,
+  能无限出题、用算法自动判对错、并用一个旋钮 <code>d</code> 控制难度。它让难度<strong>自适应</strong>:
+  每个环境维护一个难度上界 <code>h</code>,当模型在 <code>h</code> 处的准确率 <code>≥ 0.9</code> 时,就把 <code>h</code> 调高一档(只升不降)。</p>
+  <h3>问题在哪</h3>
+  <ul>
+    <li><strong>工作点定在 0.9,而不是信号最优的 0.5</strong>:模型停在准确率 0.9 才升难,而 <code>U<sub>K</sub>(0.9)≈0.57 ≪ U<sub>K</sub>(0.5)≈0.99</code>,<span class="hot">大量梯度信号被浪费在低信号区</span>。</li>
+    <li><strong>是一条写死的规则,不是可优化的目标</strong>:阈值 0.9 是拍脑袋定的;只升不降;无法分析、无法推广。</li>
+    <li><strong>没有「探索」与「不确定性」的概念</strong>:它只盯一个难度点,不会主动去试探「模型到底强在哪、弱在哪」。</li>
+  </ul>
+
+  <!-- 3 -->
+  <h2><span class="n">3</span>自由能原理是什么 · 我们怎么参照</h2>
+  <p><strong>自由能原理(Free Energy Principle, FEP)</strong> / <strong>主动推断(Active Inference)</strong>是认知科学家 Friston 提出的一套理论,
+  用来解释「智能体如何行动」。它的核心主张是:<strong>智能体选择行动,是为了最小化「期望自由能(Expected Free Energy, EFE)」</strong>。
+  而 EFE 同时包含两种价值:</p>
+  <ul>
+    <li><span class="hot">实用价值(pragmatic value)</span>:这个行动有没有帮我达成目标 / 拿到回报;</li>
+    <li><span class="cool">认知价值(epistemic value)</span>:这个行动能不能帮我<strong>减少对世界的不确定性</strong>(获取信息)。</li>
+  </ul>
+  <p>一句话:<strong>好的行动 = 既奔着目标去,又顺便把「我对环境的认识」搞得更清楚。</strong>这正是人主动选择「能学到东西」的活动的原理。</p>
+  <div class="box cool">
+    <div class="lab">怎么参照到我们的问题</div>
+    我们发现:<strong>「选哪个难度训练」本质上就是一个「行动选择」问题</strong>,而不是简单的打分。于是直接套用 active inference 的语言:
+    <table>
+      <thead><tr><th>自由能原理里的概念</th><th>我们难度自适应里的对应物</th></tr></thead>
+      <tbody>
+        <tr><td>隐藏状态 s</td><td>模型在某环境上的<strong>真实能力</strong></td></tr>
+        <tr><td>信念 q(s)</td><td>我们当前<strong>对模型能力的估计(带不确定性)</strong></td></tr>
+        <tr><td>观测 o</td><td>某难度的题做对 / 做错</td></tr>
+        <tr><td>行动 / 策略 π</td><td>选择<strong>哪个难度 d</strong> 出题</td></tr>
+        <tr><td>期望自由能 G(d)</td><td>选难度 d 的预期「代价」(信号 + 信息 + 成本)</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 4 -->
+  <h2><span class="n">4</span>我们的方法:怎么把自由能引入 RLVE</h2>
+  <p>不再用「acc≥0.9 升一档」,而是对每个候选难度 <code>d</code> 计算它的期望自由能 <code>G(d)</code>,再按 active inference 的标准方式(softmax)采样:</p>
+  <div class="eq">G<sub>e</sub>(d) = − λ<sub>signal</sub>·U<sub>K</sub>(p̂) − λ<sub>info</sub>·I(s;o|d) + λ<sub>cost</sub>·C(d)</div>
+  <div class="eq c">π(d|e) ∝ exp( − G<sub>e</sub>(d) / T )</div>
+  <p>三项的含义:</p>
+  <ul>
+    <li><span class="hot">实用价值 U<sub>K</sub>(p̂)</span> = 前面那个「一组有对有错」的概率(就是 RLVE/DAPO 里说的有效 prompt 比例),<strong>在 p=0.5 最大</strong> → 鼓励挑「信号最强」的难度。</li>
+    <li><span class="cool">认知价值 I(s;o|d)</span> = 出这道题能<strong>减少多少对模型能力的不确定性</strong>(信息增益)。太易/太难都无法区分能力,只有<strong>边界难度(p≈0.5)信息增益最大</strong>。</li>
+    <li><strong>成本 C(d)</strong>(可选):生成/验证开销,防止总挑特别贵的题。</li>
+  </ul>
+  <div class="box">
+    <div class="lab">两个独立理由都指向 0.5,且「先探索后利用」自动发生</div>
+    <ul style="margin:4px 0">
+      <li>实用价值(梯度方差视角)和认知价值(信息论视角)<strong>各自独立地</strong>都在 p≈0.5 处最大 —— 互相印证。</li>
+      <li>当我们<strong>对模型能力还不确定</strong>时(训练早期、或能力刚变化),认知项占主导 → 广泛试探不同难度去「摸清模型能力」;一旦<strong>能力估计变准</strong>,实用项占主导 → 集中在最优难度训练。<strong>这种 explore→exploit 是从自由能目标里自然涌现的,不用手动调。</strong></li>
+      <li>温度 <code>T</code>:T→0 退化成一个固定的 0.5 定点控制器(已经比 RLVE 的 0.9 更优);T→∞ 则均匀探索所有难度。</li>
+    </ul>
+  </div>
+  <h3>能力信念怎么估计、怎么更新</h3>
+  <p>用类似心理测量学 IRT 的模型:做对的概率 <code>P(对 | 能力 s, 难度 d) = σ(a·(s − d))</code>。
+  每次 rollout 看到做对/做错,就对能力后验 <code>q(s)</code> 做一次<strong>贝叶斯更新</strong> —— 这正是自由能原理里的「信念更新」。</p>
 
   <figure>
     <canvas id="fig1" width="760" height="300"></canvas>
-    <figcaption><b>Figure 1.</b> Pragmatic signal <code>U<sub>K</sub>(p)</code> (K=8) and the
-    epistemic information gain about competence, as a function of success rate <code>p</code>.
-    Both peak at <code>p=0.5</code>; RLVE's 0.9 operating point (dashed) sits far down the signal
-    curve. Curves computed from the controller in our code.</figcaption>
+    <figcaption><b>图 1.</b> 实用价值 <code>U<sub>K</sub>(p)</code>(K=8)与认知信息增益,随成功率 <code>p</code> 的变化。
+    两者<b>都在 p=0.5 峰值</b>;RLVE 的 0.9 工作点(竖线)落在信号曲线很低的位置。</figcaption>
   </figure>
 
-  <h2><span class="n">4</span>Experimental Setup</h2>
-  <p>We reproduce RLVE (SLIME backend) from <b>ProRL-1.5B-v2</b> on a single H200, training on a
-  subset of RLVE-Gym with held-out environments for generalization. All arms share the model,
-  compute, and RL algorithm (DAPO); only the difficulty sampler differs.</p>
+  <!-- 5 -->
+  <h2><span class="n">5</span>创新点小结</h2>
+  <ul>
+    <li><strong>从「按规则」到「按推断」的课程</strong>:把 RLVE 的 acc≥0.9 升难,换成 <code>π(d)∝exp(−G(d)/T)</code> 的概率采样。</li>
+    <li><strong>把「适中难度」定义成期望自由能</strong>:用 <code>U<sub>K</sub></code> 直接对齐 DAPO/RLVE 的有效训练 prompt,理论上可推导、可消融。</li>
+    <li><strong>维护模型能力的隐变量信念</strong>:难度控制从「滑窗准确率」升级为「<strong>主动推断模型能力</strong>」——这是 FEP 的核心,也是与 RLVE 最本质的区别。</li>
+  </ul>
+
+  <!-- 6 -->
+  <h2><span class="n">6</span>用什么模型、怎么做实验</h2>
+  <p><strong>模型</strong>:从 <code>ProRL-1.5B-v2</code>(NVIDIA Nemotron-Research-Reasoning-Qwen-1.5B 的 v2,RLVE 论文用的强 1.5B 推理模型起点)继续训练。
+  <strong>框架</strong>:官方 RLVE(SLIME 后端),单卡 H200。所有臂<strong>同模型、同算力、同 RL 算法(DAPO)</strong>,只换难度采样器。
+  我们的控制器是一个 drop-in 替换,用环境变量切换,不设时逐字保持 RLVE 原行为(保证对照公平)。</p>
   <table>
-    <caption><b>Table 1.</b> The four arms; only the difficulty controller changes.</caption>
-    <thead><tr><th>Arm</th><th>Difficulty policy</th><th>Isolates</th></tr></thead>
+    <thead><tr><th>对照臂</th><th>难度策略</th><th>用来检验</th></tr></thead>
     <tbody>
-    <tr><td>Static</td><td>frozen <code>d</code></td><td>fixed difficulty fails (saturate / stall)</td></tr>
-    <tr><td>RLVE-90</td><td>raise at acc&ge;0.9</td><td>published baseline (low-signal 0.9)</td></tr>
-    <tr><td>Signal-RLVE</td><td>U<sub>K</sub> only (&lambda;<sub>info</sub>=0)</td><td>target 0.5 band, no info gain</td></tr>
-    <tr class="hl"><td>FEP-RLVE (ours)</td><td>U<sub>K</sub> + info gain + EFE</td><td>full active inference</td></tr>
+      <tr><td>Static</td><td>难度冻结不变</td><td>固定难度会饱和 / 停滞</td></tr>
+      <tr><td>RLVE-90</td><td>acc≥0.9 升难(基线)</td><td>停在 0.9 低信号区</td></tr>
+      <tr><td>Signal-RLVE</td><td>只用 U<sub>K</sub>(λ<sub>info</sub>=0)</td><td>对准 0.5,但<strong>无信息增益</strong></td></tr>
+      <tr class="ours"><td>FEP-RLVE(本工作)</td><td>U<sub>K</sub> + 信息增益 + EFE</td><td>完整的自由能控制</td></tr>
     </tbody>
   </table>
-  <p>The Signal-RLVE arm is essential: only if FEP-RLVE beats it does the epistemic
-  information-gain term — the FEP core — demonstrably contribute, rather than the win reducing
-  to "replace 0.9 with 0.5".</p>
+  <p class="note"><strong>为什么必须有 Signal-RLVE:</strong>只有 FEP-RLVE 比它还好,才能证明「信息增益(FEP 的核心)」真的有贡献,而不是「只是把 0.9 改成 0.5」这么简单。这是「算不算 FEP」的关键消融。</p>
+  <h3>看什么指标</h3>
+  <ul>
+    <li><strong>有效样本率</strong> <code>U<sub>K</sub>(p̂)</code>:预期 Static 塌、RLVE-90≈0.57、Signal/FEP≈0.99。(核心机理证据)</li>
+    <li><strong>能力信念轨迹</strong>:FEP 臂的能力估计均值/标准差,σ 收缩说明在主动定位能力。</li>
+    <li><strong>泛化</strong>:训练前后在 held-out 环境 + 公开 benchmark 上的提升,主张 FEP ≥ Signal &gt; RLVE-90 &gt; Static。</li>
+  </ul>
+  <div class="box">
+    <div class="lab">目前进展(已验证)</div>
+    控制器已离线验证:<code>U<sub>K</sub></code> 与信息增益都在 p≈0.5 峰值;能力信念能跟踪上升的能力,标准差从 1.2 收缩到 0.06(即先探索后利用)。
+    RLVE 复现已在 ProRL-1.5B-v2 上正常训练(约 40 秒/步,平均组奖励约 0.41)。〈四臂完整曲线与泛化数据,待训练日志回填。〉
+  </div>
 
-  <h2><span class="n">5</span>Results</h2>
-  <p><b>Metrics.</b> (i) training-time effective sample ratio
-  <code>U<sub>K</sub>(p&#770;)</code>; (ii) competence-belief trajectory (mean&plusmn;std,
-  expected difficulty); (iii) held-out accuracy before vs after; (iv) ablations over
-  <code>&lambda;<sub>info</sub></code> and <code>T</code>.</p>
-  <p><b>Controller validation (offline).</b> Both <code>U<sub>K</sub></code> and the
-  information gain peak at <code>p&asymp;0.5</code> (Fig.&nbsp;1); under a synthetic
-  rising-competence policy the belief tracks competence and its std contracts from 1.2 to 0.06,
-  exhibiting explore&rarr;exploit. <b>Live reproduction (in progress).</b> On ProRL-1.5B-v2 the
-  RLVE-90 baseline trains stably at &asymp;40s/step with mean group reward &asymp;0.41
-  (success &asymp;0.7), i.e. <code>U<sub>K</sub>&asymp;0.99</code> early on. 〈Full four-arm
-  curves and held-out deltas to be filled from the run logs.〉</p>
-  <table>
-    <caption><b>Table 2.</b> Headline comparison (to be completed from logs).</caption>
-    <thead><tr><th>Arm</th><th>eff. sample ratio</th><th>held-out &Delta;</th></tr></thead>
-    <tbody>
-    <tr><td>Static</td><td>〈 〉</td><td>〈 〉</td></tr>
-    <tr><td>RLVE-90</td><td>〈 〉</td><td>〈 〉</td></tr>
-    <tr><td>Signal-RLVE</td><td>〈 〉</td><td>〈 〉</td></tr>
-    <tr class="hl"><td>FEP-RLVE</td><td>〈 〉</td><td>〈 〉</td></tr>
-    </tbody>
-  </table>
+  <!-- 7 -->
+  <h2><span class="n">7</span>结论与边界</h2>
+  <p>把难度选择写成<strong>期望自由能最小化</strong>,就用一个有理论依据、单一温度旋钮的控制器,替代了 RLVE 拍脑袋的 0.9 阈值:
+  它对准信号最优的工作点、并主动推断模型能力,在同等算力下维持更多学习信号。</p>
+  <p><strong>诚实的边界</strong>:当模型能力超过环境的最高难度 <code>d<sub>max</sub></code>,所有难度都饱和、信号枯竭,任何控制器都无能为力 ——
+  这反过来说明需要<strong>扩充环境(environment scaling)</strong>,正好呼应 RLVE 的核心论点,也是本工作的自然延伸。</p>
 
-  <h2><span class="n">6</span>Discussion and Limitations</h2>
-  <p>When the model outgrows the maximum difficulty, every level saturates and the signal
-  collapses for any controller — motivating environment scaling, RLVE's central thesis, as the
-  natural extension. For partial-credit (unit-test-fraction) rewards the variance-maximizing
-  point shifts off 0.5, where the explicit utility <code>U<sub>K</sub></code> is a cleaner
-  target than a hand-set threshold. The competence model is a single scalar per environment; a
-  richer multi-skill belief is future work.</p>
-
-  <h2><span class="n">7</span>Conclusion</h2>
-  <p>Casting difficulty selection as Expected-Free-Energy minimization replaces RLVE's
-  accuracy-threshold heuristic with a principled, single-knob controller that targets the
-  signal-optimal operating point and actively infers model competence, sustaining more learning
-  signal at equal compute.</p>
-
-  <div class="refs">
-    <h2><span class="n"></span>References</h2>
-    <ol>
-      <li>Zeng et al. <i>RLVE: Scaling Up Reinforcement Learning for Language Models with Adaptive Verifiable Environments.</i> arXiv:2511.07317, 2025.</li>
-      <li>Friston et al. <i>Active inference and learning.</i> Neurosci. Biobehav. Rev., 2016.</li>
-      <li>Da&nbsp;Costa et al. <i>Active inference on discrete state-spaces: a synthesis.</i> J. Math. Psych., 2020.</li>
-      <li>Yu et al. <i>DAPO: An Open-Source LLM Reinforcement Learning System at Scale.</i> 2025.</li>
-    </ol>
-    <p class="meta-tag">code: github.com/0xLian117/RLproj · baseline: github.com/Zhiyuan-Zeng/RLVE</p>
+  <div class="foot">
+    代码:github.com/0xLian117/RLproj　·　基线:RLVE (arXiv:2511.07317) Zeng et al.　·　自由能原理:Friston et al.
   </div>
 </div>
 
 <script>
-// Figure 1: U_K(p) and epistemic info-gain vs success rate p; both peak at 0.5.
 (function(){
-  var cv=document.getElementById('fig1'), ctx=cv.getContext('2d');
-  var W=cv.width,H=cv.height,L=52,R=18,T=16,B=40,pw=W-L-R,ph=H-T-B,K=8;
-  function Hb(x){ if(x<=0||x>=1)return 0; return -x*Math.log2(x)-(1-x)*Math.log2(1-x); }
-  var X=function(p){return L+p*pw;}, Y=function(v){return T+ph-v*ph;};
+  var cv=document.getElementById('fig1'),ctx=cv.getContext('2d');
+  var W=cv.width,H=cv.height,L=52,R=18,T=18,B=42,pw=W-L-R,ph=H-T-B,K=8;
+  function Hb(x){if(x<=0||x>=1)return 0;return -x*Math.log2(x)-(1-x)*Math.log2(1-x);}
+  var X=function(p){return L+p*pw;},Y=function(v){return T+ph-v*ph;};
   ctx.clearRect(0,0,W,H);
-  // axes
-  ctx.strokeStyle='#111';ctx.lineWidth=1;ctx.beginPath();
+  ctx.strokeStyle='#15181f';ctx.lineWidth=1;ctx.beginPath();
   ctx.moveTo(L,T);ctx.lineTo(L,T+ph);ctx.lineTo(L+pw,T+ph);ctx.stroke();
-  ctx.fillStyle='#555';ctx.font='12px Georgia';
+  ctx.fillStyle='#5a5f6b';ctx.font='12px Georgia';
   ctx.fillText('0',L-4,T+ph+16);ctx.fillText('0.5',X(0.5)-8,T+ph+16);ctx.fillText('1',X(1)-4,T+ph+16);
-  ctx.save();ctx.translate(14,T+ph/2);ctx.rotate(-Math.PI/2);ctx.fillText('value (normalized)',-50,0);ctx.restore();
-  ctx.fillText('success rate  p',X(0.5)-34,T+ph+32);
-  // p=0.5 guide
+  ctx.fillText('成功率 p',X(0.5)-22,T+ph+34);
   ctx.strokeStyle='#bbb';ctx.setLineDash([3,3]);ctx.beginPath();ctx.moveTo(X(0.5),T);ctx.lineTo(X(0.5),T+ph);ctx.stroke();
-  // p=0.9 RLVE op point
-  ctx.strokeStyle='#caa';ctx.beginPath();ctx.moveTo(X(0.9),T);ctx.lineTo(X(0.9),T+ph);ctx.stroke();ctx.setLineDash([]);
-  ctx.fillStyle='#7a1f1f';ctx.fillText('RLVE 0.9',X(0.9)-30,T+12);
-  // U_K(p) (solid dark-red)
-  ctx.strokeStyle='#7a1f1f';ctx.lineWidth=2.2;ctx.beginPath();
-  for(var i=0;i<=200;i++){var p=i/200,u=1-Math.pow(p,K)-Math.pow(1-p,K);var x=X(p),y=Y(u);i?ctx.lineTo(x,y):ctx.moveTo(x,y);}
+  ctx.strokeStyle='#d3b3b3';ctx.beginPath();ctx.moveTo(X(0.9),T);ctx.lineTo(X(0.9),T+ph);ctx.stroke();ctx.setLineDash([]);
+  ctx.fillStyle='#8a1f1f';ctx.fillText('RLVE 0.9',X(0.9)-32,T+12);
+  // U_K
+  ctx.strokeStyle='#8a1f1f';ctx.lineWidth=2.4;ctx.beginPath();
+  for(var i=0;i<=200;i++){var p=i/200,u=1-Math.pow(p,K)-Math.pow(1-p,K);i?ctx.lineTo(X(p),Y(u)):ctx.moveTo(X(p),Y(u));}
   ctx.stroke();
-  // info gain: H(pbar)-E_s H(...) ; with a Gaussian belief over competence, approximate by
-  // mutual info of a single Bernoulli observation whose entropy is maximal near p=0.5.
-  // We plot binary entropy Hb(p) (the leading epistemic term), normalized — peaks at 0.5.
+  // info gain (binary entropy, normalized) dashed
   ctx.strokeStyle='#2c6e8f';ctx.lineWidth=2;ctx.setLineDash([6,3]);ctx.beginPath();
-  for(var j=0;j<=200;j++){var pp=j/200,h=Hb(pp);var xx=X(pp),yy=Y(h);j?ctx.lineTo(xx,yy):ctx.moveTo(xx,yy);}
+  for(var j=0;j<=200;j++){var pp=j/200,h=Hb(pp);j?ctx.lineTo(X(pp),Y(h)):ctx.moveTo(X(pp),Y(h));}
   ctx.stroke();ctx.setLineDash([]);
-  // legend
-  ctx.font='12px Georgia';
-  ctx.fillStyle='#7a1f1f';ctx.fillText('— U_K(p) pragmatic signal (K=8)',L+10,T+16);
-  ctx.fillStyle='#2c6e8f';ctx.fillText('-- epistemic info gain', L+10,T+34);
+  ctx.font='13px sans-serif';
+  ctx.fillStyle='#8a1f1f';ctx.fillText('— U_K(p) 实用价值/学习信号 (K=8)',L+12,T+18);
+  ctx.fillStyle='#2c6e8f';ctx.fillText('-- 认知价值 / 信息增益',L+12,T+38);
 })();
 </script>
 </body>
