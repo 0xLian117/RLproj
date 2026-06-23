@@ -8,9 +8,9 @@ combines *pragmatic* value (goal) and *epistemic* value (information gain).
 
 EFE per (environment e, difficulty d):
 
-    G_e(d) = − λ_signal · U_K(p̂_e(d))        # pragmatic: training signal
-             − λ_info   · I_e(d)              # epistemic: info gain about competence
-             + λ_cost   · C_e(d)              # cost (optional; rollout/verify expense)
+    G_e(d) = + λ_pref · ( − log U_K(p̂_e(d)) )   # pragmatic: preference RISK (−log P_pref)
+             − λ_info · I_e(d)                   # epistemic: info gain about competence
+             + λ_cost · C_e(d)                   # cost (optional; rollout/verify expense)
 
     π(d | e) ∝ exp( − G_e(d) / T )
 
@@ -18,6 +18,13 @@ where, for a group of K rollouts at predicted success p̂, the DAPO/RLVE
 "effective prompt ratio" (prob the group is non-degenerate → keeps a gradient) is
 
     U_K(p) = 1 − p^K − (1−p)^K          (maximized at p = 0.5)
+
+The pragmatic term is the proper active-inference *preference risk*
+E_{q(o|d)}[−log P_pref(o)]: we prefer outcomes where the group is informative
+(0 < #correct < K), whose predicted probability is U_K(p̂). Writing it as
+−log U_K(p̂) (rather than the linear −U_K) makes it the literal −log P_pref, and
+makes degenerate difficulties (U_K→0, i.e. all-pass / all-fail) carry risk →+∞,
+so they are strongly repelled. Setting λ_info=0 recovers the Signal-RLVE ablation.
 
 and the epistemic information gain about latent competence s_e is
 
@@ -31,7 +38,7 @@ Ablations (same code, flags):
   * RLVE-90      : not this controller (the original threshold rule).
   * Static       : not this controller (frozen difficulty).
   * Signal-RLVE  : λ_info = 0          (target the signal band, no info gain).
-  * FEP-RLVE     : λ_info > 0          (full EFE: signal + info gain + Gibbs).
+  * FEP-RLVE     : λ_info > 0          (full EFE: signal + info gain + softmax policy).
 
 Dependency-free (no torch/slime); see active_inference_manager.py for SLIME wiring.
 """
@@ -86,8 +93,11 @@ class FEPRLVEController:
         return sum(qi * self._p(s, d) for qi, s in zip(self.q, self.s_grid))
 
     # ---- EFE terms ----
-    def signal(self, d: int) -> float:              # pragmatic: U_K(p̂)
-        return U_K(self.p_hat(d), self.K)
+    def signal(self, d: int) -> float:              # effective sample ratio U_K(p̂)
+        return U_K(self.p_hat(d), self.K)           #   (diagnostic / logged metric)
+
+    def pragmatic(self, d: int) -> float:           # EFE pragmatic = preference RISK
+        return -math.log(max(self.signal(d), 1e-12))  #   −log U_K(p̂)  (=−log P_pref)
 
     def info_gain(self, d: int) -> float:           # epistemic: I(s; o | d)
         pbar = self.p_hat(d)
@@ -98,9 +108,9 @@ class FEPRLVEController:
         return float(self.cost.get(d, 0.0))
 
     def G(self, d: int) -> float:                   # expected free energy (minimize)
-        return (-self.l_sig * self.signal(d)
-                - self.l_info * self.info_gain(d)
-                + self.l_cost * self.C(d))
+        return (self.l_sig * self.pragmatic(d)      # +λ_pref·(−log U_K)  (preference risk)
+                - self.l_info * self.info_gain(d)   # −λ_info·I           (info gain)
+                + self.l_cost * self.C(d))          # +λ_cost·C           (cost)
 
     def policy(self) -> Tuple[List[int], List[float]]:
         ds = list(range(self.d_min, self.d_max + 1))
@@ -155,14 +165,14 @@ class FEPRLVEController:
 
 if __name__ == "__main__":
     rng = random.Random(0)
-    print("=== peaks: U_K(signal) and info-gain both maximal at p≈0.5 ===")
+    print("=== peaks: U_K maximal & pragmatic risk (−logU_K) minimal at p≈0.5; G min near 0.5 ===")
     c = FEPRLVEController(d_min=0, d_max=16, K=8, slope=1.0)
     for i, s in enumerate(c.s_grid):  # pin belief at competence ≈ 8
         c.q[i] = math.exp(-0.5 * ((s - 8) / 0.6) ** 2)
     z = sum(c.q); c.q = [x / z for x in c.q]
-    print(" d  p̂(d)  U_K(signal)  info_gain")
+    print("  d  p̂(d)   U_K   −logU_K   info_gain     G(d)")
     for d in [4, 6, 7, 8, 9, 10, 12]:
-        print(f"{d:3d}  {c.p_hat(d):.2f}   {c.signal(d):.3f}       {c.info_gain(d):.3f}")
+        print(f"{d:3d}   {c.p_hat(d):.2f}  {c.signal(d):.3f}  {c.pragmatic(d):7.3f}     {c.info_gain(d):.3f}   {c.G(d):7.3f}")
 
     print("\n=== FEP-RLVE: belief tracks rising competence; explore→exploit ===")
     c = FEPRLVEController(d_min=0, d_max=16, K=8, slope=1.2, T=0.25)

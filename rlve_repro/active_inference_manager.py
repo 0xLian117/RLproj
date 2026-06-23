@@ -4,7 +4,10 @@ difficulty by minimizing Expected Free Energy (active inference), instead of the
 
 Per environment it keeps a posterior over the model's latent competence
 (FEPRLVEController) and, each step, samples difficulty from π(d) ∝ exp(−G_e(d)/T),
-    G_e(d) = − λ_signal·U_K(p̂) − λ_info·I(s;o|d) + λ_cost·C(d).
+    G_e(d) = + λ_signal·(−log U_K(p̂)) − λ_info·I(s;o|d) + λ_cost·C(d).
+The pragmatic term is the active-inference preference risk −log P_pref(o) with the
+preference set on "the group is informative" (predicted prob U_K(p̂)); −log U_K
+sends risk →+∞ for degenerate (all-pass/all-fail) difficulties. FE_LSIG = λ_signal.
 After rollouts it Bayesian-updates the competence belief from observed correct/wrong.
 
 Subclasses the real `slime.ray.rollout_data_source.RLVEManager` and overrides only
