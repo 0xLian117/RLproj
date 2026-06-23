@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<title>FEP-RLVE Poster</title>
+<style>
+  /* ---- A0 portrait poster: 841mm x 1189mm. Print/export at this size. ---- */
+  :root{
+    --ink:#13203a; --mut:#5b667e; --rule:#d7dae3; --bg:#eef0f4; --paper:#ffffff;
+    --hot:#c0392b;       /* pragmatic / ours / explore */
+    --cool:#2c6e8f;      /* epistemic / belief */
+    --bar:#0f1626;
+    --panel:#f6f7f9;
+    --sans:"Arial","Helvetica Neue",system-ui,"PingFang SC","Microsoft YaHei",sans-serif;
+    --mono:"SF Mono",ui-monospace,Menlo,Consolas,monospace;
+  }
+  *{box-sizing:border-box; margin:0; padding:0}
+  body{background:var(--bg); font-family:var(--sans); color:var(--ink);
+    display:flex; justify-content:center; padding:24px}
+  .poster{
+    width:841mm; min-height:1189mm; background:var(--paper);
+    padding:26mm 24mm 22mm; box-shadow:0 2px 14px rgba(0,0,0,.18);
+  }
+  /* placeholder style — every "future figure" slot */
+  .ph{border:2px dashed #b9c0d0; border-radius:6px; background:repeating-linear-gradient(45deg,#fafbfc,#fafbfc 14px,#f1f3f7 14px,#f1f3f7 28px);
+    display:flex; align-items:center; justify-content:center; text-align:center; color:#8a93a8;
+    font-family:var(--mono); font-size:15pt; line-height:1.5}
+  /* ---- header ---- */
+  header{background:var(--bar); color:#fff; border-radius:10px; padding:20mm 18mm; text-align:center}
+  h1{font-size:40pt; line-height:1.18; letter-spacing:-.01em}
+  h1 .em{color:#ff9359}
+  .sub{font-size:21pt; color:#c7cee0; font-style:italic; margin-top:6mm}
+  .meta{font-family:var(--mono); font-size:14pt; color:#9ba6c2; margin-top:7mm}
+  /* ---- grid ---- */
+  .grid{display:grid; grid-template-columns:1fr 1fr; gap:12mm; margin-top:12mm}
+  .col{display:flex; flex-direction:column; gap:12mm}
+  .panel{background:var(--panel); border:1px solid var(--rule); border-radius:10px; padding:11mm 12mm}
+  .panel.full{grid-column:1 / -1}
+  .pt{font-size:24pt; font-weight:bold; margin-bottom:6mm; display:flex; align-items:baseline; gap:5mm}
+  .pt .nx{font-family:var(--mono); font-size:19pt; color:var(--hot)}
+  .panel p,.panel li{font-size:16.5pt; line-height:1.5; color:#26304a}
+  .panel ul{padding-left:8mm; margin:3mm 0}
+  .panel li{margin:2.5mm 0}
+  .hot{color:var(--hot); font-weight:bold} .cool{color:var(--cool); font-weight:bold}
+  .eq{font-family:var(--mono); font-size:16pt; background:#fff; border:1px solid var(--rule);
+    border-left:4px solid var(--hot); border-radius:5px; padding:6mm 7mm; margin:5mm 0; line-height:1.6}
+  .eq.c{border-left-color:var(--cool)}
+  table{width:100%; border-collapse:collapse; margin-top:4mm; font-size:15.5pt}
+  th,td{border-top:1.5px solid var(--ink); border-bottom:1px solid var(--rule); padding:4mm 4mm; text-align:left; vertical-align:top}
+  thead th{border-bottom:2px solid var(--ink); font-size:16pt}
+  tr.ours td{background:#faece8} tr.ours td:first-child{color:var(--hot); font-weight:bold}
+  .note{font-size:14pt; color:var(--mut); margin-top:4mm; font-style:italic}
+  footer{margin-top:12mm; border-top:1px solid var(--rule); padding-top:5mm;
+    font-family:var(--mono); font-size:13.5pt; color:var(--mut); text-align:center}
+  /* map table mapping */
+  .map td{font-size:15pt}
+</style>
+</head>
+<body>
+<div class="poster">
+
+  <header>
+    <h1>FEP-RLVE:用<span class="em">期望自由能</span>选择训练难度<br>Curriculum by Inference for Verifiable Environments</h1>
+    <div class="sub">把 RLVE 的「准确率≥0.9 升难」启发式,换成 active-inference 的行动选择</div>
+    <div class="meta">〈姓名 / 学号〉　·　RL with Env Scaling　·　baseline: RLVE (arXiv:2511.07317)　·　model: ProRL-1.5B-v2</div>
+  </header>
+
+  <div class="grid">
+
+    <!-- ===== LEFT ===== -->
+    <div class="col">
+
+      <div class="panel">
+        <div class="pt"><span class="nx">01</span>问题:固定难度为何「学不动」</div>
+        <p>GRPO/DAPO 以<strong>一组 K 个 rollout</strong> 为单位更新。一组全对或全错 → 组内无差异 → 梯度为 0,算力浪费。</p>
+        <p>一组「有对有错(可用)」的概率:</p>
+        <div class="eq">U<sub>K</sub>(p) = 1 − p<sup>K</sup> − (1−p)<sup>K</sup>　<span class="hot">在 p=0.5 最大</span></div>
+        <ul>
+          <li>太易(p→1)/太难(p→0):U<sub>K</sub>→0,信号枯竭</li>
+          <li>RLVE 升难点 0.9 → <span class="hot">U<sub>K</sub>(0.9)≈0.57 ≪ U<sub>K</sub>(0.5)≈0.99</span>:低信号区</li>
+        </ul>
+      </div>
+
+      <div class="panel">
+        <div class="pt"><span class="nx">02</span>方法:最小化期望自由能 (EFE)</div>
+        <p>把「选哪个难度训练」当作 active inference 的<strong>行动选择</strong>:为每个环境维护对「模型能力」的信念 q(s),选 EFE 最小的难度。</p>
+        <div class="eq">G<sub>e</sub>(d) = −λ<sub>sig</sub>·U<sub>K</sub>(p̂) − λ<sub>info</sub>·I(s;o|d) + λ<sub>cost</sub>·C(d)</div>
+        <div class="eq c">π(d|e) ∝ exp( −G<sub>e</sub>(d) / T )</div>
+        <ul>
+          <li><span class="hot">pragmatic</span> U<sub>K</sub>:学习信号(DAPO 有效 prompt 比例)</li>
+          <li><span class="cool">epistemic</span> I(s;o|d):对能力的信息增益</li>
+          <li>T→0 ⇒ 固定 0.5 定点(优于 RLVE 的 0.9);信念不确定 ⇒ 探索,定准 ⇒ 利用(自动)</li>
+        </ul>
+        <table class="map">
+          <tr><td>hidden state s</td><td>模型能力</td></tr>
+          <tr><td>action π</td><td>选难度 d</td></tr>
+          <tr><td>belief q(s)</td><td>对能力的后验(IRT 似然 σ(a(s−d)))</td></tr>
+        </table>
+      </div>
+
+      <div class="panel">
+        <div class="pt"><span class="nx">03</span>实验设置</div>
+        <p>官方 RLVE(SLIME)从 ProRL-1.5B-v2 复现,单卡 H200。同模型、同算力、同 RL 算法(DAPO),<strong>只换难度采样器</strong>。Drop-in 控制器,<code>DIFFICULTY_MODE</code> 切换,默认逐字保持 RLVE。</p>
+        <table>
+          <thead><tr><th>臂</th><th>难度策略</th></tr></thead>
+          <tbody>
+            <tr><td>Static</td><td>难度冻结</td></tr>
+            <tr><td>RLVE-90</td><td>acc≥0.9 升难(基线)</td></tr>
+            <tr><td>Signal-RLVE</td><td>只 U<sub>K</sub>(λ<sub>info</sub>=0,消融)</td></tr>
+            <tr class="ours"><td>FEP-RLVE</td><td>U<sub>K</sub>+信息增益+EFE(本工作)</td></tr>
+          </tbody>
+        </table>
+        <p class="note">Signal-RLVE 是关键消融:FEP-RLVE 须胜过它,才证明信息增益(FEP 核心)有贡献。</p>
+      </div>
+
+    </div>
+
+    <!-- ===== RIGHT ===== -->
+    <div class="col">
+
+      <div class="panel">
+        <div class="pt"><span class="nx">★</span>核心洞察:两类价值都在 p=0.5 峰值</div>
+        <!-- 占位:U_K 与信息增益曲线图(都在 0.5 峰值) -->
+        <div class="ph" style="height:200mm">［图 1 占位］<br>U_K(p) 与 epistemic 信息增益 vs 成功率 p<br>(都在 p=0.5 峰值;标出 RLVE 的 0.9 工作点)<br><br>← 后续把 poster_fig1.png 放这里</div>
+      </div>
+
+      <div class="panel">
+        <div class="pt"><span class="nx">04</span>结果:有效样本率(机理)</div>
+        <!-- 占位:四臂 effective sample ratio vs 训练步 -->
+        <div class="ph" style="height:120mm">［图 2 占位］<br>四臂 effective sample ratio vs 训练步<br>预期:Static 塌 / RLVE-90 停 0.9 / FEP 维持~1.0</div>
+      </div>
+
+      <div class="panel">
+        <div class="pt"><span class="nx">05</span>结果:难度轨迹 & 泛化</div>
+        <div class="ph" style="height:80mm; margin-bottom:6mm">［图 3 占位］难度/能力轨迹:Static 平线 · RLVE 升到 0.9 · FEP 对准 0.5(σ 收缩)</div>
+        <table>
+          <thead><tr><th>臂</th><th>eff. ratio</th><th>held-out Δ</th></tr></thead>
+          <tbody>
+            <tr><td>Static</td><td>〈　〉</td><td>〈　〉</td></tr>
+            <tr><td>RLVE-90</td><td>〈　〉</td><td>〈　〉</td></tr>
+            <tr><td>Signal-RLVE</td><td>〈　〉</td><td>〈　〉</td></tr>
+            <tr class="ours"><td>FEP-RLVE</td><td>〈　〉</td><td>〈　〉</td></tr>
+          </tbody>
+        </table>
+        <p class="note">数据从训练日志 / held-out 评测回填。</p>
+      </div>
+
+      <div class="panel">
+        <div class="pt"><span class="nx">06</span>结论</div>
+        <ul>
+          <li>难度 = 一个控制目标(EFE),而非 0.9 阈值</li>
+          <li>一个温度旋钮统一「利用 / 探索」</li>
+          <li>主动推断模型能力 → curriculum by inference</li>
+          <li>边界:模型超过 d<sub>max</sub> 时全饱和 → 需环境 scaling(呼应 RLVE)</li>
+        </ul>
+      </div>
+
+    </div>
+  </div>
+
+  <footer>
+    code: github.com/0xLian117/RLproj　·　baseline: RLVE (arXiv:2511.07317) — Zeng et al.　·　active inference: Friston et al.
+  </footer>
+</div>
+</body>
+</html>
