@@ -21,6 +21,7 @@ RESP_LEN=${RESP_LEN:-8192}
 ROLLOUT_BSZ=${ROLLOUT_BSZ:-32}
 N_SAMPLES=${N_SAMPLES:-8}
 MAX_TOK=${MAX_TOK:-8192}
+OVERSAMPLE=${OVERSAMPLE:-16}          # DAPO 超采样 prompt 数(原版 384!→ 每步生成 OVERSAMPLE×N_SAMPLES 条)
 # 时长控制:总步数 / 存档间隔 / 评测间隔
 MAX_STEPS=${MAX_STEPS:-50}                  # --num-rollout(对照只需分化,~50 步足够)
 SAVE_EVERY=${SAVE_EVERY:-${MAX_STEPS}}      # 默认只在最后存一次,省盘省时
@@ -49,6 +50,7 @@ sed -i -E 's/--context-parallel-size 8/--context-parallel-size 1/' "$RLVE_SH"
 sed -i -E "s/--rollout-max-response-len 24576/--rollout-max-response-len ${RESP_LEN}/" "$RLVE_SH"
 sed -i -E "s/--rollout-batch-size 128/--rollout-batch-size ${ROLLOUT_BSZ}/" "$RLVE_SH"
 sed -i -E "s/--n-samples-per-prompt 16/--n-samples-per-prompt ${N_SAMPLES}/" "$RLVE_SH"
+sed -i -E "s/--over-sampling-batch-size 384/--over-sampling-batch-size ${OVERSAMPLE}/" "$RLVE_SH"
 sed -i -E "s/--max-tokens-per-gpu 3072/--max-tokens-per-gpu ${MAX_TOK}/" "$RLVE_SH"
 # 时长控制:总步数 / 存档 / 评测间隔
 sed -i -E "s/--num-rollout 1000000/--num-rollout ${MAX_STEPS}/" "$RLVE_SH"
