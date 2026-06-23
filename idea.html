@@ -122,6 +122,31 @@
   <p>不再用「acc≥0.9 升一档」,而是对每个候选难度 <code>d</code> 计算它的期望自由能 <code>G(d)</code>,再按 active inference 的标准方式(softmax)采样:</p>
   <div class="eq">G<sub>e</sub>(d) = − λ<sub>signal</sub>·U<sub>K</sub>(p̂) − λ<sub>info</sub>·I(s;o|d) + λ<sub>cost</sub>·C(d)</div>
   <div class="eq c">π(d|e) ∝ exp( − G<sub>e</sub>(d) / T )</div>
+
+  <h3>这个公式是怎么从自由能一步步推出来的(不是凭空设计)</h3>
+  <p>「完整期望自由能」= <span class="hot">signal(实用)</span> + <span class="cool">info gain(认知)</span> + <strong>Gibbs(策略)</strong>,三块各自来自自由能原理的标准结论:</p>
+  <div class="box">
+    <div class="lab">STEP 1 · 感知:变分自由能 → 能力信念</div>
+    <p style="margin:4px 0">自由能原理说智能体最小化<strong>变分自由能</strong>(= 负 ELBO = 复杂度−准确度):</p>
+    <div class="eq">F = E<sub>q</sub>[ ln q(s) − ln p(o,s) ]</div>
+    <p style="margin:4px 0">对信念 q 最小化它 ⇒ <code>q(s) ≈ p(s|o)</code>,这正是<strong>贝叶斯更新</strong>。所以我们维护一个能力后验 <code>q(s)</code>,似然 <code>P(对|s,d)=σ(a(s−d))</code>,每步用观测(做对/错)更新它。</p>
+  </div>
+  <div class="box">
+    <div class="lab">STEP 2 · 行动:期望自由能 → 目标 G(d)</div>
+    <p style="margin:4px 0">要<strong>选动作</strong>(=选难度 d)时未来观测 o 还没发生,于是对预测 o 取期望,得到<strong>期望自由能</strong>,它<strong>天然分解</strong>成两项:</p>
+    <div class="eq">G(d) = − E<sub>q</sub>[ ln p(o) ]　<span class="hot">实用价值</span>　　− I(s;o|d)　<span class="cool">认知价值</span></div>
+    <ul style="margin:4px 0">
+      <li><span class="hot">实用项</span>:把「偏好」<code>p(o)</code> 定义为<strong>「这次观测能产生 RL 学习信号」</strong>。一组 K 个 rollout 非退化(有对有错→有梯度)的概率正是 <code>U<sub>K</sub>(p̂)=1−p̂<sup>K</sup>−(1−p̂)<sup>K</sup></code> ⇒ 得到 <code>−λ<sub>signal</sub>U<sub>K</sub></code>。</li>
+      <li><span class="cool">认知项</span>:<code>I(s;o|d)=H[q(s)]−E<sub>o</sub>H[q(s|o,d)]</code> ⇒ 得到 <code>−λ<sub>info</sub>I</code>。</li>
+      <li>再加可选成本 <code>+λ<sub>cost</sub>C(d)</code>,就得到上面那个 <code>G(d)</code> 公式。</li>
+    </ul>
+  </div>
+  <div class="box">
+    <div class="lab">STEP 3 · 策略:Gibbs → 采样分布</div>
+    <p style="margin:4px 0">把标量 <code>G(d)</code> 变成「选哪个难度」:在<strong>「期望 EFE 减 温度×熵」</strong>这个泛函上最小化 <code>min<sub>π</sub> E<sub>π</sub>[G(d)] − T·H[π]</code>,闭式解就是 <strong>Gibbs/Boltzmann 分布</strong> <code>π(d)∝exp(−G(d)/T)</code>。T→0 贪心选最优难度,T→∞ 均匀探索。</p>
+    <p style="margin:4px 0"><strong>由此可见 RLVE 是它的硬特例:</strong>「acc≥0.9 → d+1」≈ 取 <code>λ<sub>info</sub>=0</code>、<code>T→0</code>、且偏好「高准确率」而非「0.5 信号」的退化版本——硬阈值、贪心、只升不降。</p>
+  </div>
+
   <p>三项的含义:</p>
   <ul>
     <li><span class="hot">实用价值 U<sub>K</sub>(p̂)</span> = 前面那个「一组有对有错」的概率(就是 RLVE/DAPO 里说的有效 prompt 比例),<strong>在 p=0.5 最大</strong> → 鼓励挑「信号最强」的难度。</li>
