@@ -47,6 +47,14 @@
     <div class="sub">把 RLVE 的「准确率≥0.9 升难」启发式,换成 active-inference 的行动选择</div>
     <div class="meta">〈姓名 / 学号〉　·　RL with Env Scaling　·　baseline: RLVE (arXiv:2511.07317)　·　model: ProRL-1.5B-v2　·　单卡 H200</div>
   </header>
+  <div style="margin-top:9mm;background:#fdf3ee;border:2px solid #c0392b;border-radius:10px;padding:9mm 12mm;text-align:center">
+    <span style="font-size:19pt;color:#13203a;line-height:1.5">
+    RL 训练大模型推理,真正缺的不是题,而是<b style="color:#c0392b">「难度刚好让模型对一半」</b>的题——因为只有这种题才产生梯度信号。
+    RLVE 用「做对 90% 才升难」的规则,却把模型停在信号很弱的地方;
+    我们用<b style="color:#c0392b">自由能原理</b>把「选哪个难度训练」变成一次决策,
+    <b>同时追求「最大学习信号」与「最快摸清模型能力」</b>,自动把训练维持在信号最强的难度上。
+    </span>
+  </div>
 
   <div class="grid">
     <!-- LEFT -->
@@ -70,6 +78,18 @@
           <li><span class="cool">epistemic</span> I(s;o|d):对能力的信息增益(边界难度最大)</li>
           <li>能力信念用 IRT σ(a(s−d)) 贝叶斯更新;不确定→探索,定准→利用(自动)</li>
         </ul>
+        <div style="margin-top:5mm;background:#fff;border:1px dashed #b9c0d0;border-radius:6px;padding:5mm 7mm;font-size:14.5pt;line-height:1.7;color:#26304a">
+          <b>符号说明</b>　
+          <b>d</b>=难度等级；
+          <b>p̂</b>=模型在该难度的预测成功率；
+          <b>K</b>=每题采样的 rollout 数(组大小,本文 K=8)；
+          <b style="color:#c0392b">U<sub>K</sub>(p̂)=1−p̂<sup>K</sup>−(1−p̂)<sup>K</sup></b>=一组里「有对有错、能产生梯度」的概率(p̂=0.5 最大)；
+          <b style="color:#2c6e8f">I(s;o|d)</b>=出难度 d 的题对「模型能力 s」的信息增益；
+          <b>s</b>=模型隐含能力,<b>o</b>=做对/做错的观测,<b>q(s)</b>=对能力的信念(后验)；
+          <b>λ<sub>sig</sub>,λ<sub>info</sub>,λ<sub>cost</sub></b>=三项权重；
+          <b>T</b>=温度(T→0 只挑最优难度 0.5;T→∞ 均匀探索)；
+          <b>G(d)</b>=难度 d 的期望自由能(越小越该选)。
+        </div>
       </div>
 
       <div class="panel">
