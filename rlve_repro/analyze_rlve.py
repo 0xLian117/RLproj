@@ -106,6 +106,19 @@ def main():
     if any(any(r.get("truncated") is not None for r in arms[a]) for a in order):
         plot("truncated","truncated ratio","truncated.png")
 
+    # held-out generalization trajectory (before -> after)
+    if any(evalsd.get(a) for a in order):
+        fig,ax=plt.subplots(figsize=(7,4.3))
+        for a in order:
+            ev=evalsd.get(a,{})
+            if not ev: continue
+            xs=sorted(ev); ys=[ev[x] for x in xs]
+            ax.plot(xs,ys,marker="o",color=COL.get(a,"#444"),label=ARM_LABEL.get(a,a))
+        ax.set_xlabel("training step (rollout)"); ax.set_ylabel("held-out reward (HELD-OUT_ENVIRONMENTS_128)")
+        ax.set_title("Held-out generalization: before vs after training")
+        ax.legend(fontsize=8); ax.grid(alpha=.3); fig.tight_layout()
+        p=os.path.join(figdir,"heldout.png"); fig.savefig(p,dpi=130); plt.close(fig); print("wrote",p)
+
     # REPORT.md
     with open(os.path.join(args.out,"REPORT.md"),"w") as f:
         f.write("# RLVE difficulty-strategy results (ProRL-1.5B-v2, 4 envs)\n\n")

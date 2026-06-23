@@ -178,17 +178,18 @@
   <div class="box">
     <div class="lab">实验结果(ProRL-1.5B-v2,4 环境,各 30 步,单卡 H200)</div>
     <table style="margin-top:4px">
-      <thead><tr><th>臂</th><th>平均成功率 p</th><th>平均有效样本率 U<sub>K</sub></th></tr></thead>
+      <thead><tr><th>臂</th><th>平均成功率 p</th><th>平均有效样本率 U<sub>K</sub></th><th>held-out 训练前→后</th></tr></thead>
       <tbody>
-        <tr><td>RLVE-90(acc≥0.9 基线)</td><td>0.580</td><td>0.962</td></tr>
-        <tr><td>Signal-RLVE(λ<sub>info</sub>=0)</td><td>0.461</td><td>0.974</td></tr>
-        <tr class="ours"><td>FEP-RLVE(本工作)</td><td>0.444</td><td>0.970</td></tr>
+        <tr><td>RLVE-90(acc≥0.9 基线)</td><td>0.580</td><td>0.962</td><td>−0.92 → −0.81</td></tr>
+        <tr><td>Signal-RLVE(λ<sub>info</sub>=0)</td><td>0.461</td><td>0.974</td><td>−0.90 → <strong>−0.77</strong></td></tr>
+        <tr class="ours"><td>FEP-RLVE(本工作)</td><td>0.444</td><td>0.970</td><td>−0.92 → −0.81(单调上升)</td></tr>
       </tbody>
     </table>
-    <p style="margin:8px 0 0">核心现象(见成功率曲线):<strong>RLVE-90 早期把成功率推到 0.7–0.83</strong>(太易、低信号区),
+    <p style="margin:8px 0 0"><strong>① 训练动态</strong>(成功率曲线):<strong>RLVE-90 早期把成功率推到 0.7–0.83</strong>(太易、低信号区),
     而 <span class="hot">FEP / Signal 全程贴着 0.5 信号最优带</span> —— 验证了「对准 0.5 比停在 0.9 更优」。
-    在这一小规模(4 个较易环境、30 步)下三者有效样本率都高(0.96–0.97),差异温和;
-    更大环境/更多步数下分化预期更明显。控制器另已离线验证:<code>U<sub>K</sub></code> 与信息增益都在 p≈0.5 峰值,能力信念 σ 从 1.2 收缩到 0.06(explore→exploit)。</p>
+    <strong>② 泛化</strong>:三臂训练后 held-out 都从 ≈−0.92 提升(RL 确有泛化),<span class="hot">Signal 终值最好(−0.77)、FEP 提升最单调</span>。
+    <strong>③ 诚实边界</strong>:小规模(4 个较易环境、30 步、1.5B)下有效样本率都高(0.96–0.97)、held-out 仍为负且区分度小;更大环境/更多步数下分化预期更明显。
+    控制器另已离线验证:<code>U<sub>K</sub></code> 与信息增益都在 p≈0.5 峰值,能力信念 σ 从 1.2 收缩到 0.06(explore→exploit)。</p>
   </div>
 
   <!-- 7 -->
