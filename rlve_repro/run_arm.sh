@@ -5,14 +5,15 @@
 #
 #   ARM=adaptive   NUM_ENV=16 bash run_arm.sh RLVE          # RLVE 基线(acc≥0.9 升难)
 #   ARM=static     NUM_ENV=16 STATIC_D=4 bash run_arm.sh RLVE   # 静态难度(冻结在 d=4)
-#   ARM=freeenergy NUM_ENV=16 bash run_arm.sh RLVE          # 自由能(我们,需先 apply_patch.py)
+#   ARM=signal     NUM_ENV=16 bash run_arm.sh RLVE          # Signal-RLVE 消融(需先 apply_patch.py)
+#   ARM=fep        NUM_ENV=16 bash run_arm.sh RLVE          # FEP-RLVE(我们,需先 apply_patch.py)
 #
-# 依赖:已 `python apply_patch.py --rlve $PWD`(freeenergy 臂必须);权重已转换。
+# 依赖:已 `python apply_patch.py --rlve $PWD`(signal/fep 臂必须);权重已转换。
 # ============================================================================
 set -euo pipefail
 
 WANDB_PROJECT=${1:-RLVE}
-ARM=${ARM:-adaptive}                 # adaptive | static | freeenergy
+ARM=${ARM:-adaptive}                 # adaptive(RLVE-90) | static | signal(Signal-RLVE) | fep(FEP-RLVE,ours)
 NUM_ENV=${NUM_ENV:-16}               # 1 / 4 / 16 / 256 / 400
 STATIC_D=${STATIC_D:-4}              # 仅 static 臂:冻结的难度等级
 # 单卡负载(OOM 就调小)
@@ -50,8 +51,9 @@ echo "== [3] 按 ARM 设难度策略 =="
 case "$ARM" in
   adaptive)    EXTRA="";  unset DIFFICULTY_MODE || true ;;
   static)      EXTRA="--initial-difficulty ${STATIC_D} --difficulty-sliding-window-size 1 --min-metric-to-increase-difficulty 2.0"; unset DIFFICULTY_MODE || true ;;
-  freeenergy)  EXTRA="";  export DIFFICULTY_MODE=freeenergy ;;
-  *) echo "ERROR: ARM 必须是 adaptive|static|freeenergy"; exit 1 ;;
+  signal)      EXTRA="";  export DIFFICULTY_MODE=signal ;;
+  fep)         EXTRA="";  export DIFFICULTY_MODE=fep ;;
+  *) echo "ERROR: ARM 必须是 adaptive|static|signal|fep"; exit 1 ;;
 esac
 # 把额外 RLVE 参数注入到 train.py 调用(--colocate 之后)
 if [ -n "$EXTRA" ]; then

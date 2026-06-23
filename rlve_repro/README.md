@@ -54,36 +54,38 @@ bash scripts/evaluation/Nemotron-Research-Reasoning-Qwen-1.5B-v2/eval_BENCHMARKS
 bash scripts/evaluation/Nemotron-Research-Reasoning-Qwen-1.5B-v2/eval_HELD-OUT_ENVIRONMENTS.sh <ckpt>
 ```
 
-## 5. 创新点:自由能难度控制器(已对真实 RLVE 代码实现)
+## 5. 创新点:FEP-RLVE(Expected Free Energy 难度选择,对真实 RLVE 代码实现)
 RLVE 的难度调度全在 **`slime/ray/rollout_data_source.py` 的 `RLVEManager`**:
-`generate_problem()` 选难度、`update()` 按 acc≥0.9 升难(只升不降)。我们的创新是把它
-换成按 **Gibbs 分布 `q(d)∝exp(U(d)/T)`** 采样难度的控制器(`U(d)=1−p^G−(1−p)^G`,0.5 处最大),
-可升可降、对准信号最优带。
+`generate_problem()` 选难度、`update()` 按 acc≥0.9 升难(只升不降)。我们把它换成
+**active inference / Expected Free Energy** 选难度:每环境维护能力后验 `q(s_e)`,按
+`π(d)∝exp(−G_e(d)/T)` 采样,`G_e(d)=−λ_signal·U_K(p̂)−λ_info·I(s;o|d)+λ_cost·C(d)`,
+`U_K(p)=1−p^K−(1−p)^K`(= RLVE/DAPO 的有效 prompt 比例,0.5 处最大),
+`I` 为对能力的信息增益。可升可降、主动定位能力(explore→exploit 自动涌现)。
 
 本目录文件:
-- `freeenergy_manager.py` — `FreeEnergyRLVEManager(RLVEManager)`,只重写 `generate_problem()`/`update()`
-  (按真实 RLVE 接口:`Sample.metadata{environment,problem_difficulty}`、`reward["accuracy"]`、
-  `ParameterController.update()/get_parameter_list()`),对真实代码已离线验证逻辑正确。
-- `apply_patch.py` — 把上面的 manager 拷进 RLVE 根目录,并在 `RLVEManager` 实例化处加一个
-  env 变量开关:`DIFFICULTY_MODE=freeenergy` 时用我们的 manager,否则原样 RLVE(幂等)。
-- `freeenergy_controller.py` — 同算法的独立纯 Python 版(便于单测/讲解)。
+- `active_inference_controller.py` — `FEPRLVEController`,纯 Python,已离线验证:
+  `U_K` 与信息增益都在 p≈0.5 峰值;belief 跟踪上升能力、σ 收缩。
+- `active_inference_manager.py` — `FEPRLVEManager(RLVEManager)`,只重写
+  `generate_problem()`/`update()`(按真实 RLVE 接口:`Sample.metadata`、`reward["accuracy"]`、
+  `ParameterController.update()/get_parameter_list()`)。
+- `apply_patch.py` — 把上两个文件拷进 RLVE 根目录,并在 `RLVEManager` 实例化处加
+  env 变量开关(幂等,默认不改 RLVE 行为)。
 
 接入(一次):
 ```bash
-# 在 RLVE 仓库根目录
-python /path/to/rlve_repro/apply_patch.py --rlve "$PWD"
-# 之后:DIFFICULTY_MODE=freeenergy 那一臂才用自由能,不设则逐字保持 RLVE 原行为
+python /path/to/rlve_repro/apply_patch.py --rlve "$PWD"   # 在 RLVE 仓库根目录
 ```
-超参经 env 变量:`FE_DMAX(16) FE_G(=n_samples_per_prompt) FE_T0(0.6) FE_TMIN(0.1) FE_ANNEAL(60) FE_EMA(0.7)`。
+- `DIFFICULTY_MODE` 不设 → 原样 RLVE-90;`=signal` → Signal-RLVE 消融(λ_info=0);`=fep` → FEP-RLVE。
+- 超参(env 变量):`FE_DMAX(16) FE_K(=n_samples_per_prompt) FE_SLOPE(1.0) FE_LSIG(1.0) FE_LINFO(1.0) FE_LCOST(0.0) FE_T(0.25)`。
 
-## 6. 实验怎么跑
-见 **`EXPERIMENT_PLAN.md`**:A 组(环境 scaling 复现)+ B 组(static / RLVE / free-energy 三臂对照)。
-用 `run_arm.sh`(本目录,已指向你的模型路径):
+## 6. 实验怎么跑(四臂,见 EXPERIMENT_PLAN.md)
+用 `run_arm.sh`(已指向你的模型路径):
 ```bash
-ARM=adaptive   NUM_ENV=1  bash run_arm.sh RLVE     # 先跑通最小臂
-ARM=adaptive   NUM_ENV=16 bash run_arm.sh RLVE     # RLVE 基线
-ARM=static     NUM_ENV=16 STATIC_D=4 bash run_arm.sh RLVE
-ARM=freeenergy NUM_ENV=16 bash run_arm.sh RLVE     # 需先 apply_patch.py
+ARM=adaptive NUM_ENV=1  bash run_arm.sh RLVE              # 先跑通最小臂
+ARM=adaptive NUM_ENV=16 bash run_arm.sh RLVE             # RLVE-90 基线
+ARM=static   NUM_ENV=16 STATIC_D=4 bash run_arm.sh RLVE  # Static
+ARM=signal   NUM_ENV=16 bash run_arm.sh RLVE             # Signal-RLVE 消融(先 apply_patch)
+ARM=fep      NUM_ENV=16 bash run_arm.sh RLVE             # FEP-RLVE(我们)
 ```
 
-先把 §0–§4 原始复现(A1)跑通,再做 §5–§6。
+先把 §0–§4 原始复现(`ARM=adaptive NUM_ENV=1`)跑通,再做 §5–§6。
