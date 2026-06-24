@@ -1,0 +1,1075 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FEP-RLVE Academic Poster</title>
+<style>
+  @page { size: 600.0mm 900.0mm; margin: 0; }
+
+  :root {
+    --ink: #10213d;
+    --text: #26334d;
+    --muted: #68738b;
+    --line: #d7dde8;
+    --soft-line: #edf0f5;
+    --red: #a63d33;
+    --blue: #1f6a86;
+    --green: #287245;
+    --paper: #ffffff;
+    --heading: "PingFang SC", "Hiragino Sans GB", "Noto Sans CJK SC", "Microsoft YaHei", sans-serif;
+    --body: "Source Han Serif SC", "Noto Serif CJK SC", "Songti SC", "STSong", "Times New Roman", serif;
+    --cn: var(--heading);
+    --en: "Avenir Next", "Helvetica Neue", Arial, sans-serif;
+    --math: "Times New Roman", "STIX Two Text", "STIX Two Math", "Cambria Math", "TeX Gyre Termes", serif;
+    --mono: "Menlo", "SF Mono", "Consolas", monospace;
+  }
+
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  html, body {
+    background: #e4e7ef;
+    color: var(--ink);
+    font-family: var(--body);
+  }
+
+  body {
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    padding: 18px 0;
+  }
+
+  .poster {
+    position: relative;
+    width: 600.0mm;
+    height: 900.0mm;
+    overflow: hidden;
+    background: var(--paper) url("poster_assets/poster_bg.jpg") center / 100% 100% no-repeat;
+    box-shadow: 0 12px 42px rgba(8, 18, 35, .22);
+  }
+
+  @media print {
+    body { padding: 0; background: #fff; }
+    .poster { box-shadow: none; }
+  }
+
+  .header {
+    position: absolute;
+    left: 55.263mm;
+    right: 55.263mm;
+    top: 72.632mm;
+    height: 116.842mm;
+    color: #fff;
+    text-align: center;
+  }
+
+  h1 {
+    font-family: var(--en);
+    font-size: 51.89pt;
+    line-height: 1.02;
+    font-weight: 760;
+    letter-spacing: -.015em;
+  }
+
+  h1 em {
+    font-style: italic;
+    color: #fff;
+  }
+
+  .authors {
+    margin-top: 11.842mm;
+    font-family: var(--heading);
+    font-size: 24.77pt;
+    line-height: 1.2;
+    font-weight: 650;
+    letter-spacing: .18em;
+    color: rgba(255, 255, 255, .9);
+  }
+
+  main {
+    position: absolute;
+    left: 25.263mm;
+    right: 25.263mm;
+    top: 198.947mm;
+    bottom: 36.316mm;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 198.947mm 146.053mm 264.474mm 51.316mm;
+    gap: 0.789mm 17.368mm;
+    --grid-line: rgba(16, 33, 61, .18);
+    --grid-line-soft: rgba(16, 33, 61, .105);
+  }
+
+  main::before,
+  main::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 2;
+  }
+
+  main::before {
+    background:
+      linear-gradient(90deg, rgba(16, 33, 61, 0), var(--grid-line) 7%, var(--grid-line) 93%, rgba(16, 33, 61, 0)) 0 202.342mm / 100% 0.268mm no-repeat,
+      linear-gradient(90deg, rgba(16, 33, 61, 0), var(--grid-line) 7%, var(--grid-line) 93%, rgba(16, 33, 61, 0)) 0 346.184mm / 100% 0.268mm no-repeat,
+      linear-gradient(90deg, rgba(16, 33, 61, 0), var(--grid-line-soft) 7%, var(--grid-line-soft) 93%, rgba(16, 33, 61, 0)) 0 594.079mm / 100% 0.237mm no-repeat;
+  }
+
+  main::after {
+    background:
+      linear-gradient(180deg, rgba(16, 33, 61, 0), var(--grid-line) 9%, var(--grid-line) 91%, rgba(16, 33, 61, 0)) 50% 0 / 0.268mm 198.947mm no-repeat,
+      linear-gradient(180deg, rgba(16, 33, 61, 0), var(--grid-line) 9%, var(--grid-line) 91%, rgba(16, 33, 61, 0)) 50% 346.579mm / 0.268mm 247.5mm no-repeat;
+  }
+
+  section {
+    position: relative;
+    min-width: 0;
+    padding-top: 3.947mm;
+  }
+
+  section::after {
+    content: none;
+  }
+
+  .panel-bg {
+    column-count: 2;
+    column-gap: 5.526mm;
+  }
+
+  .panel-bg .head {
+    column-span: all;
+  }
+
+  .panel-bg p {
+    font-size: 14.66pt;
+    line-height: 1.27;
+  }
+
+  .panel-bg .lead {
+    font-size: 19.57pt;
+    line-height: 1.25;
+    margin-bottom: 1.579mm;
+  }
+
+  .panel-bg .equation {
+    margin: 1.263mm 0;
+    padding: 1.184mm 0;
+  }
+
+  .panel-bg .equation .line {
+    font-size: 16.74pt;
+    line-height: 1.22;
+  }
+
+  .panel-bg .equation .small {
+    font-size: 12.77pt;
+  }
+
+  .panel-bg .inline-claim {
+    margin-top: 0.789mm;
+    padding-top: 0.789mm;
+    font-size: 12.77pt;
+    line-height: 1.24;
+  }
+
+  .panel-bg .symbol-table {
+    margin: 1.105mm 0 0;
+  }
+
+  .panel-bg .symbol-table td {
+    padding: 0.671mm 0.789mm;
+    font-size: 11.25pt;
+    line-height: 1.18;
+  }
+
+  .panel-bg .symbol-table td:first-child {
+    width: 14.211mm;
+  }
+
+  .subhead {
+    font-family: var(--heading);
+    font-size: 15.03pt;
+    line-height: 1.18;
+    font-weight: 820;
+    color: var(--ink);
+    margin: 1.184mm 0 0.789mm;
+    break-after: avoid;
+  }
+
+  .free-basics {
+    break-before: column;
+  }
+
+  .panel-bg .equation,
+  .panel-bg .symbol-table,
+  .panel-bg .inline-claim,
+  .subhead,
+  .derive-step {
+    break-inside: avoid;
+  }
+
+  .span-row {
+    grid-column: 1 / -1;
+  }
+
+  .panel-derivation {
+    margin-top: 3mm;
+  }
+
+  .panel-framework,
+  .panel-results {
+    padding-top: 0;
+  }
+
+  .panel-closing {
+    padding-top: 0;
+    margin-top: -17.368mm;
+  }
+
+  .head {
+    margin-bottom: 2.526mm;
+  }
+
+  h2 {
+    font-family: var(--heading);
+    font-size: 29.88pt;
+    line-height: 1.12;
+    font-weight: 860;
+    letter-spacing: .025em;
+    color: var(--ink);
+  }
+
+  p, li {
+    font-family: var(--body);
+    font-size: 19.01pt;
+    line-height: 1.42;
+    color: var(--text);
+    font-weight: 430;
+  }
+
+  p + p { margin-top: 1.579mm; }
+  b { color: var(--ink); font-weight: 800; }
+  .red { color: var(--red); font-weight: 800; }
+  .blue { color: var(--blue); font-weight: 800; }
+  .green { color: var(--green); font-weight: 800; }
+  .math { font-family: var(--math); font-style: normal; }
+  .latex {
+    font-family: var(--math);
+    font-style: normal;
+    font-weight: 400;
+    letter-spacing: 0;
+    word-spacing: .025em;
+    font-variant-numeric: lining-nums;
+  }
+
+  sub, sup {
+    font-size: 70%;
+    line-height: 0;
+  }
+
+  sub { vertical-align: -.28em; }
+  sup { vertical-align: .46em; }
+
+  ul {
+    margin-top: 2.368mm;
+    padding-left: 5.526mm;
+  }
+
+  li {
+    margin: 1.105mm 0;
+  }
+
+  li::marker {
+    color: var(--red);
+  }
+
+  .lead {
+    font-family: var(--heading);
+    font-size: 21.0pt;
+    line-height: 1.32;
+    font-weight: 740;
+    color: var(--ink);
+    margin-bottom: 2.368mm;
+  }
+
+  .equation {
+    margin: 2.368mm 0;
+    padding: 2.211mm 0;
+    text-align: center;
+    border-top: 1px solid var(--soft-line);
+    border-bottom: 1px solid var(--soft-line);
+  }
+
+  .equation .line {
+    display: block;
+    font-family: var(--math);
+    font-size: 22.69pt;
+    line-height: 1.32;
+    font-style: normal;
+    color: var(--ink);
+  }
+
+  .equation .small {
+    margin-top: 0.789mm;
+    font-size: 17.5pt;
+  }
+
+  .inline-claim {
+    margin-top: 1.579mm;
+    padding-top: 1.579mm;
+    border-top: 1px solid var(--soft-line);
+    font-family: var(--body);
+    font-size: 15.7pt;
+    line-height: 1.42;
+    color: var(--text);
+  }
+
+  .mini-figure {
+    margin: 2.053mm 0;
+  }
+
+  .mini-figure svg {
+    width: 100%;
+    height: auto;
+    display: block;
+    background: #fff;
+  }
+
+  .mini-figure img {
+    width: 100%;
+    max-height: 45.789mm;
+    object-fit: contain;
+    display: block;
+    background: #fff;
+  }
+
+  .panel-free-energy .mini-figure img {
+    max-height: 47.368mm;
+  }
+
+  .panel-free-energy .lead {
+    font-size: 17.97pt;
+    line-height: 1.2;
+    margin-bottom: 1.263mm;
+  }
+
+  .panel-free-energy .mini-figure {
+    margin: 1.105mm 0 1.263mm;
+  }
+
+  .panel-free-energy .inline-claim {
+    margin-top: 0.632mm;
+    padding-top: 0.632mm;
+    font-size: 12.57pt;
+    line-height: 1.2;
+  }
+
+  .mini-figure text {
+    font-family: var(--cn);
+    fill: var(--text);
+  }
+
+  .mini-figure .svg-math {
+    font-family: var(--math);
+    font-style: normal;
+  }
+
+  .mini-caption {
+    margin-top: 0.632mm;
+    font-family: var(--body);
+    font-size: 12.19pt;
+    line-height: 1.22;
+    text-align: center;
+    color: var(--muted);
+  }
+
+  .derive-chain {
+    margin-top: 0.947mm;
+  }
+
+  .derive-step {
+    padding: 0.908mm 0;
+    border-top: 1px solid var(--soft-line);
+  }
+
+  .derive-label {
+    font-family: var(--heading);
+    font-size: 12.87pt;
+    line-height: 1.2;
+    font-weight: 800;
+    color: var(--ink);
+    margin-bottom: 0.632mm;
+  }
+
+  .derive-eq {
+    display: block;
+    text-align: center;
+    font-family: var(--math);
+    font-style: normal;
+    font-size: 15.22pt;
+    line-height: 1.35;
+    color: var(--ink);
+    white-space: nowrap;
+  }
+
+  .derive-note {
+    margin-top: 0.632mm;
+    font-size: 11.91pt;
+    line-height: 1.18;
+    color: var(--text);
+  }
+
+  .derive-vars {
+    margin: 0.947mm 0;
+  }
+
+  .derive-vars td {
+    padding: 0.592mm 0.789mm;
+    font-size: 11.16pt;
+    line-height: 1.15;
+  }
+
+  .derive-vars td:nth-child(odd) {
+    width: 12.632mm;
+    font-family: var(--math);
+    font-style: normal;
+    color: var(--ink);
+    white-space: nowrap;
+  }
+
+  .symbol-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1.895mm 0;
+    border-top: 1px solid var(--soft-line);
+    border-bottom: 1px solid var(--soft-line);
+  }
+
+  .symbol-table td {
+    padding: 1.066mm 1.263mm;
+    border-bottom: 1px solid var(--soft-line);
+    font-family: var(--body);
+    font-size: 13.81pt;
+    line-height: 1.28;
+    color: var(--text);
+    vertical-align: top;
+  }
+
+  .symbol-table tr:last-child td {
+    border-bottom: 0;
+  }
+
+  .symbol-table td:first-child {
+    width: 22.105mm;
+    font-family: var(--math);
+    font-style: normal;
+    color: var(--ink);
+    white-space: nowrap;
+  }
+
+  .state-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 2.763mm;
+  }
+
+  .state-table th,
+  .state-table td {
+    padding: 1.421mm 1.737mm;
+    border-bottom: 1px solid var(--soft-line);
+    text-align: left;
+    vertical-align: top;
+    font-size: 14.66pt;
+    line-height: 1.3;
+    color: var(--text);
+  }
+
+  .state-table th {
+    font-family: var(--heading);
+    font-size: 9.08pt;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: var(--muted);
+    font-weight: 700;
+  }
+
+  .state-table td:first-child {
+    width: 26.053mm;
+    font-family: var(--heading);
+    color: var(--ink);
+    font-weight: 800;
+  }
+
+  .state-table td:nth-child(3) {
+    font-family: var(--math);
+    font-style: normal;
+    color: var(--ink);
+    white-space: nowrap;
+  }
+
+  .loop {
+    margin-top: 2.763mm;
+    border-top: 1px solid var(--ink);
+    padding-top: 1.895mm;
+  }
+
+  .loop-title {
+    font-family: var(--heading);
+    font-size: 16.74pt;
+    line-height: 1.35;
+    font-weight: 800;
+    color: var(--ink);
+    margin-bottom: 1.263mm;
+  }
+
+  .loop-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 2.368mm;
+  }
+
+  .loop-step {
+    border-top: 2px solid var(--line);
+    padding-top: 1.579mm;
+  }
+
+  .loop-step b {
+    display: block;
+    font-family: var(--heading);
+    font-size: 14.56pt;
+    color: var(--blue);
+    margin-bottom: 0.789mm;
+  }
+
+  .loop-step p {
+    font-family: var(--body);
+    font-size: 13.43pt;
+    line-height: 1.28;
+  }
+
+  .loop-step .formula {
+    margin-top: 0.789mm;
+    font-family: var(--math);
+    font-size: 13.24pt;
+    line-height: 1.3;
+    color: var(--ink);
+    font-style: normal;
+    letter-spacing: 0;
+    word-spacing: .025em;
+  }
+
+  .table-caption {
+    margin-top: 2.368mm;
+    font-family: var(--heading);
+    font-size: 14.47pt;
+    line-height: 1.28;
+    font-weight: 800;
+    color: var(--ink);
+  }
+
+  .booktabs {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 0.789mm;
+    border-top: 1.8px solid var(--ink);
+    border-bottom: 1.8px solid var(--ink);
+  }
+
+  .booktabs thead {
+    border-bottom: 1.2px solid var(--ink);
+  }
+
+  .booktabs th,
+  .booktabs td {
+    padding: 1.5mm 1.421mm;
+    text-align: left;
+    vertical-align: top;
+    font-family: var(--body);
+    font-size: 14.47pt;
+    line-height: 1.3;
+    color: var(--text);
+  }
+
+  .booktabs th {
+    font-family: var(--heading);
+    font-size: 12.77pt;
+    font-weight: 800;
+    color: var(--ink);
+  }
+
+  .booktabs td:first-child {
+    font-family: var(--heading);
+    color: var(--ink);
+    font-weight: 800;
+    white-space: nowrap;
+  }
+
+  .booktabs.algo td:first-child {
+    width: 10.263mm;
+    text-align: center;
+    font-family: var(--math);
+    font-style: normal;
+  }
+
+  .booktabs.algo td:nth-child(2) {
+    color: var(--ink);
+  }
+
+  .booktabs.algo td:nth-child(3) {
+    width: 19.737mm;
+    font-family: var(--en);
+    font-size: 12.38pt;
+    color: var(--muted);
+    white-space: nowrap;
+  }
+
+  .booktabs.hyper td:first-child {
+    width: 26.842mm;
+    font-family: var(--heading);
+    font-size: 12.57pt;
+    letter-spacing: 0;
+    white-space: nowrap;
+  }
+
+  .booktabs.hyper td:nth-child(2) {
+    width: auto;
+    color: var(--ink);
+  }
+
+  .algorithm {
+    margin-top: 0.789mm;
+    padding: 1.421mm 0 1.105mm;
+    border-top: 1.8px solid var(--ink);
+    border-bottom: 1.8px solid var(--ink);
+    color: var(--text);
+  }
+
+  .algorithm-title {
+    padding-bottom: 0.868mm;
+    border-bottom: 1px solid var(--line);
+    font-family: var(--heading);
+    font-size: 14.66pt;
+    line-height: 1.25;
+    font-weight: 800;
+    color: var(--ink);
+  }
+
+  .algorithm-io {
+    padding: 0.671mm 0 0.671mm;
+    border-bottom: 1px solid var(--soft-line);
+    font-family: var(--body);
+    font-size: 11.91pt;
+    line-height: 1.18;
+  }
+
+  .io-line {
+    display: block;
+    white-space: nowrap;
+  }
+
+  .algorithm-line {
+    display: grid;
+    grid-template-columns: 6.632mm 1fr;
+    gap: 1.263mm;
+    padding: 0.434mm 0;
+    font-family: var(--math);
+    font-size: 14.47pt;
+    line-height: 1.24;
+  }
+
+  .algorithm-line .ln {
+    text-align: right;
+    color: var(--muted);
+    font-family: var(--math);
+    font-style: normal;
+  }
+
+  .algorithm-line .code {
+    color: var(--text);
+  }
+
+  .algorithm-line.has-note .code {
+    display: grid;
+    grid-template-columns: minmax(0, max-content) max-content;
+    column-gap: 2.368mm;
+    align-items: baseline;
+  }
+
+  .alg-note {
+    justify-self: end;
+    font-family: var(--heading);
+    font-size: 11.91pt;
+    color: var(--muted);
+    white-space: nowrap;
+  }
+
+  .algorithm-line .indent {
+    padding-left: 3.789mm;
+  }
+
+  .algorithm-line .indent2 {
+    padding-left: 7.579mm;
+  }
+
+  .kw {
+    font-family: var(--heading);
+    font-weight: 800;
+    color: var(--ink);
+  }
+
+  .figures {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 2.053mm;
+    margin-top: 2.368mm;
+  }
+
+  figure img {
+    width: 100%;
+    height: 71.053mm;
+    object-fit: contain;
+    object-position: center;
+    display: block;
+    border: 1px solid var(--line);
+    background: #fff;
+  }
+
+  figcaption {
+    margin-top: 0.789mm;
+    font-family: var(--body);
+    font-size: 12.96pt;
+    line-height: 1.24;
+    color: var(--muted);
+  }
+
+  .result-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 2.368mm;
+  }
+
+  .result-table th,
+  .result-table td {
+    padding: 2.053mm 1.263mm;
+    border-bottom: 1px solid var(--soft-line);
+    text-align: left;
+    font-family: var(--body);
+    font-size: 14.18pt;
+    color: var(--text);
+  }
+
+  .result-table th {
+    font-family: var(--heading);
+    font-size: 12.19pt;
+    line-height: 1.24;
+    letter-spacing: 0;
+    color: var(--muted);
+  }
+
+  .result-table td:first-child {
+    font-family: var(--heading);
+    color: var(--ink);
+    font-weight: 800;
+  }
+
+  .result-table tr.highlight td {
+    background: #eef6f9;
+  }
+
+  .closing {
+    margin-top: 0.316mm;
+    font-family: var(--body);
+    font-size: 16.27pt;
+    line-height: 1.22;
+    color: var(--text);
+    display: grid;
+    gap: 0.434mm;
+  }
+
+  .closing div {
+    white-space: normal;
+  }
+
+  .closing b {
+    font-family: var(--heading);
+    color: var(--ink);
+    font-weight: 820;
+    display: inline-block;
+    min-width: 14.211mm;
+  }
+</style>
+</head>
+<body>
+<article class="poster">
+  <header class="header">
+    <h1>FEP-RLVE: <em>Expected Free Energy</em><br>Difficulty Control for Verifiable Environments</h1>
+    <div class="authors">程练　包煜　温力成</div>
+  </header>
+
+  <main>
+    <section class="panel-bg">
+      <div class="head">
+        <h2>背景</h2>
+      </div>
+      <div class="subhead">RLVE</div>
+      <p>
+        现有 RLVE 以验证正确率阈值驱动难度递增，但该准则将任务完成率近似为训练价值，忽略了 rollout 组内奖励方差对策略梯度的决定作用。
+      </p>
+      <p>
+        在 RLVE 中，每个环境维护一个难度上界；当最近的验证正确率超过阈值时，上界单调上移。
+        这类难度控制规则隐含假设是“高正确率意味着应当升难”。然而 GRPO/DAPO 的有效更新依赖
+        rollout 组内的奖励差异；当一组样本全对或全错时，优势估计退化，prompt 对 policy gradient
+        的边际贡献显著下降。
+      </p>
+      <div class="equation">
+        <span class="line latex">U<sub>K</sub>(p) = 1 − p<sup>K</sup> − (1 − p)<sup>K</sup></span>
+        <span class="line small latex">K = 4 时，U<sub>K</sub>(0.9) = 0.344，而 U<sub>K</sub>(0.5) = 0.875</span>
+      </div>
+      <p class="inline-claim">
+        因此，固定阈值策略存在两个结构性偏差：其一，acc ≥ 0.9 偏向低方差高成功率样本；其二，单调升难缺乏基于观测的回退机制。
+      </p>
+      <div class="subhead free-basics">自由能原理</div>
+      <p>
+        自由能原理（Free Energy Principle, FEP）是 Karl Friston 提出的信息物理与认知科学框架，用于解释自组织系统如何在与环境耦合时维持稳定状态。
+        其基本观点是：系统通过内部生成模型预测感觉输入，并最小化 surprisal，即观测的负对数概率，或其变分上界。
+      </p>
+      <p>
+        在贝叶斯表述中，系统不能直接访问产生观测的隐藏状态，只能以近似后验 <span class="latex">q(s)</span> 表示对隐藏原因的信念；
+        生成模型 <span class="latex">p(o,s)=p(o|s)p(s)</span> 则描述隐藏状态如何生成观测。最小化自由能可被理解为提高预测准确性、约束模型复杂度，并通过 active inference 将感知更新与行动选择统一起来。
+      </p>
+      <div class="equation">
+        <span class="line latex">F(q) = E<sub>q</sub>[log q(s) − log p(o,s)]</span>
+        <span class="line latex">= D<sub>KL</sub>(q(s) || p(s | o)) − log p(o) ≥ −log p(o)</span>
+      </div>
+      <table class="symbol-table">
+        <tr><td>s</td><td>隐藏状态；在本文中对应环境级 latent competence。</td></tr>
+        <tr><td>o</td><td>观测；在 RLVE 中是验证器返回的 correct/wrong。</td></tr>
+        <tr><td>q(s)</td><td>环境难度控制器维护的能力信念，实际写作 <span class="latex">q<sub>e</sub>(s)</span>。</td></tr>
+        <tr><td>p(s | o)</td><td>观测后的真实后验；自由能最小化使 <span class="latex">q(s)</span> 向它靠近。</td></tr>
+        <tr><td>F(q)</td><td>surprise <span class="latex">−log p(o)</span> 的可优化上界，越低表示信念与观测越一致。</td></tr>
+      </table>
+    </section>
+
+    <section class="panel-free-energy">
+      <div class="head">
+        <h2>自由能推导</h2>
+      </div>
+      <p class="lead">
+        下图为自由能示意图与简单推导。
+      </p>
+      <div class="mini-figure">
+        <img src="https://media.springernature.com/lw685/springer-static/image/art%3A10.1007%2Fs11571-023-09963-x/MediaObjects/11571_2023_9963_Fig1_HTML.png" alt="Active inference generative model diagram">
+        <div class="mini-caption">Active inference 将生成模型、观测和行动耦合为闭环；图源：Parr, Friston &amp; Pezzulo, 2024, CC BY 4.0。</div>
+      </div>
+      <table class="symbol-table derive-vars">
+        <tr><td>x</td><td>隐藏状态，外部原因。</td><td>y(a)</td><td>观测，依赖行动 a。</td></tr>
+        <tr><td>q(x)</td><td>近似后验，当前信念。</td><td>p(x, y(a))</td><td>联合生成模型。</td></tr>
+        <tr><td>a</td><td>行动或策略。</td><td>F</td><td>变分自由能。</td></tr>
+      </table>
+      <div class="derive-chain">
+        <div class="derive-step">
+          <div class="derive-label">1. 变分自由能：信念与生成模型的偏离</div>
+          <span class="derive-eq">F = E<sub>q</sub>[ln q(x) − ln p(x, y(a))]</span>
+          <p class="derive-note">图中 <span class="latex">x</span> 为隐藏状态、<span class="latex">y(a)</span> 为依赖行动的观测、<span class="latex">q(x)</span> 为近似后验；<span class="latex">F</span> 是 surprise <span class="latex">−ln p(y(a))</span> 的变分上界。</p>
+        </div>
+        <div class="derive-step">
+          <div class="derive-label">2. 感知分解：散度 − 对数证据</div>
+          <span class="derive-eq">F = D<sub>KL</sub>[q(x) ‖ p(x | y(a))] − ln p(y(a))</span>
+          <span class="derive-eq">q(x) = arg min<sub>q</sub> F</span>
+          <p class="derive-note">固定观测、对信念求极小：散度项为零时 <span class="latex">q(x) = p(x | y(a))</span>，即贝叶斯感知更新。</p>
+        </div>
+        <div class="derive-step">
+          <div class="derive-label">3. 等价分解：复杂度 − 精度</div>
+          <span class="derive-eq">F = D<sub>KL</sub>[q(x) ‖ p(x)] − ln p(y(a) | x)</span>
+          <p class="derive-note">同一 <span class="latex">F</span> 的另一分解：惩罚信念偏离先验（复杂度），奖励对观测的解释（精度）。</p>
+        </div>
+        <div class="derive-step">
+          <div class="derive-label">4. 行动闭环：选择带来可取观测的行动</div>
+          <span class="derive-eq">a = arg min<sub>a</sub> F ≈ arg max<sub>a</sub> p(y(a))</span>
+          <p class="derive-note">观测依赖行动 <span class="latex">y(a)</span>，对行动取极小 <span class="latex">F</span> ＝ 最大化模型证据；在 RLVE 中行动即选难度 <span class="latex">d</span>，对未来观测取期望得期望自由能。</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="span-row panel-derivation">
+      <div class="head">
+        <h2>从自由能视角重写 RLVE 难度选择</h2>
+      </div>
+      <p>
+        我们将环境难度控制器表述为 environment-level active-inference controller：隐藏状态是模型能力，行动是选择题目难度，
+        观测是验证器的 correct/wrong。
+      </p>
+      <table class="state-table">
+        <tr>
+          <th>自由能概念</th>
+          <th>在 RLVE 中的含义</th>
+          <th>符号</th>
+          <th>作用</th>
+        </tr>
+        <tr>
+          <td>隐藏状态</td>
+          <td>模型在环境 e 上的 latent competence，不能直接观测，只能由验证器反馈推断。</td>
+          <td>s<sub>e</sub>, q<sub>e</sub>(s)</td>
+          <td>替代 RLVE 中单调难度上界，形成可更新的能力信念。</td>
+        </tr>
+        <tr>
+          <td>观测</td>
+          <td>给定难度后，rollout 被验证器判定为 correct/wrong。</td>
+          <td>o ∈ {0,1}</td>
+          <td>既是训练奖励，也是更新能力后验的证据。</td>
+        </tr>
+        <tr>
+          <td>行动</td>
+          <td>为下一批题目选择候选难度，而不是由固定阈值单调推进。</td>
+          <td>d</td>
+          <td>从规则式难度调度变为显式行动选择。</td>
+        </tr>
+        <tr>
+          <td>偏好</td>
+          <td>偏好非退化 rollout 组，即组内同时出现 correct 与 wrong，从而保留优势估计。</td>
+          <td>U<sub>K</sub>(p̂<sub>e</sub>(d))</td>
+          <td>将“高准确率”替换为“高学习信号”。</td>
+        </tr>
+        <tr>
+          <td>目标</td>
+          <td>选择低偏好风险、高信息增益、低成本的难度。</td>
+          <td>G<sub>e</sub>(d)</td>
+          <td>得到可消融的 FEP-RLVE / Signal-RLVE。</td>
+        </tr>
+      </table>
+      <div class="loop">
+        <div class="loop-title">控制循环：依据能力后验评估候选难度，按低期望自由能采样行动，并用验证器观测执行贝叶斯更新。</div>
+        <div class="loop-grid">
+          <div class="loop-step">
+            <b>读取信念</b>
+            <p>为每个环境维护 latent competence 后验。</p>
+            <div class="formula latex">q<sub>e</sub>(s)</div>
+          </div>
+          <div class="loop-step">
+            <b>预测成功率</b>
+            <p>由 IRT 风格似然估计 correct 概率。</p>
+            <div class="formula latex">p̂<sub>e</sub>(d) = E<sub>s∼q<sub>e</sub></sub> σ(a(s − d))</div>
+          </div>
+          <div class="loop-step">
+            <b>计算自由能</b>
+            <p>联合偏好风险、信息增益与成本项评分。</p>
+            <div class="formula latex">G<sub>e</sub>(d) = λ<sub>sig</sub>(−log U) − λ<sub>info</sub>I + λ<sub>cost</sub>C</div>
+          </div>
+          <div class="loop-step">
+            <b>选择难度</b>
+            <p>依据 Boltzmann policy 从候选难度中采样。</p>
+            <div class="formula latex">π(d | e) ∝ exp(−G<sub>e</sub>(d) / T)</div>
+          </div>
+          <div class="loop-step">
+            <b>更新后验</b>
+            <p>将验证器输出作为观测更新后验。</p>
+            <div class="formula latex">q<sub>e</sub>(s) ← q<sub>e</sub>(s) · P(o | s,d)</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel-framework">
+      <div class="head">
+        <h2>框架、伪代码与训练参数</h2>
+      </div>
+      <p>
+        实现层面，FEP-RLVE 作为 RLVEManager 的可替换环境难度控制器：保留 Gym 环境、验证器与 GRPO 内核，
+        仅修改题目生成前的难度选择，以及 rollout 后的能力后验更新。
+      </p>
+      <div class="table-caption">表 1　FEP-RLVE 难度控制算法</div>
+      <div class="algorithm">
+        <div class="algorithm-title">Algorithm 1: Environment-Level Difficulty Controller</div>
+        <div class="algorithm-io">
+          <span class="io-input"><span class="kw">Input:</span> 环境集合 <span class="latex">E</span>，候选难度集合 <span class="latex">D<sub>e</sub></span>，rollout 组大小 <span class="latex">K</span>，后验 <span class="latex">q<sub>e</sub>(s)</span>，观测 <span class="latex">o</span>，权重 <span class="latex">λ<sub>sig</sub>, λ<sub>info</sub>, λ<sub>cost</sub></span>，温度 <span class="latex">T</span>。</span>
+          <span class="io-line"><span class="kw">Output:</span> 采样难度 <span class="latex">d<sub>t</sub></span> 与更新后的后验 <span class="latex">q<sub>e</sub>(s)</span>。</span>
+        </div>
+        <div class="algorithm-line"><span class="ln">1</span><span class="code"><span class="kw">for</span> training iteration <span class="latex">t = 1, …, N</span> <span class="kw">do</span></span></div>
+        <div class="algorithm-line"><span class="ln">2</span><span class="code indent">sample environment <span class="latex">e ∼ E</span> and read belief <span class="latex">q<sub>e</sub>(s)</span></span></div>
+        <div class="algorithm-line"><span class="ln">3</span><span class="code indent"><span class="kw">for each</span> candidate difficulty <span class="latex">d ∈ D<sub>e</sub></span> <span class="kw">do</span></span></div>
+        <div class="algorithm-line has-note"><span class="ln">4</span><span class="code indent2"><span class="latex">p<sub>d</sub> ← E<sub>s∼q<sub>e</sub></sub> σ(a(s − d))</span> <span class="alg-note">success probability</span></span></div>
+        <div class="algorithm-line has-note"><span class="ln">5</span><span class="code indent2"><span class="latex">U<sub>d</sub> ← 1 − p<sub>d</sub><sup>K</sup> − (1 − p<sub>d</sub>)<sup>K</sup></span> <span class="alg-note">valid-signal score</span></span></div>
+        <div class="algorithm-line"><span class="ln">6</span><span class="code indent2"><span class="latex">q<sub>d</sub><sup>1</sup>(s) ← norm[q<sub>e</sub>(s)P(o=1 | s,d)]</span></span></div>
+        <div class="algorithm-line"><span class="ln">7</span><span class="code indent2"><span class="latex">q<sub>d</sub><sup>0</sup>(s) ← norm[q<sub>e</sub>(s)P(o=0 | s,d)]</span></span></div>
+        <div class="algorithm-line"><span class="ln">8</span><span class="code indent2"><span class="latex">I<sub>d</sub> ← p<sub>d</sub>D<sub>KL</sub>(q<sub>d</sub><sup>1</sup> || q<sub>e</sub>) + (1−p<sub>d</sub>)D<sub>KL</sub>(q<sub>d</sub><sup>0</sup> || q<sub>e</sub>)</span></span></div>
+        <div class="algorithm-line"><span class="ln">9</span><span class="code indent2"><span class="latex">G<sub>d</sub> ← λ<sub>sig</sub>[−log U<sub>d</sub>] − λ<sub>info</sub>I<sub>d</sub> + λ<sub>cost</sub>C<sub>e</sub>(d)</span></span></div>
+        <div class="algorithm-line"><span class="ln">10</span><span class="code indent"><span class="kw">end for</span></span></div>
+        <div class="algorithm-line"><span class="ln">11</span><span class="code indent"><span class="latex">d<sub>t</sub> ∼ softmax(−G<sub>d</sub> / T)</span>; generate task and collect <span class="latex">O<sub>t</sub> = {o<sub>t,k</sub>}</span></span></div>
+        <div class="algorithm-line"><span class="ln">12</span><span class="code indent">update policy with GRPO rewards from verifier outcomes</span></div>
+        <div class="algorithm-line"><span class="ln">13</span><span class="code indent"><span class="latex">q<sub>e</sub>(s) ← norm[q<sub>e</sub>(s) ∏<sub>k</sub>P(o<sub>t,k</sub> | s,d<sub>t</sub>)]</span></span></div>
+        <div class="algorithm-line"><span class="ln">14</span><span class="code"><span class="kw">end for</span></span></div>
+      </div>
+
+      <div class="table-caption">表 2　实验设置与超参数</div>
+      <table class="booktabs hyper">
+        <thead>
+          <tr>
+            <th>项</th>
+            <th>设置</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>groups</td><td>RLVE-90 作为 baseline；Signal-RLVE 与 FEP-RLVE 作为对比组。</td></tr>
+          <tr><td>training</td><td>4 envs; 30 rollout steps; all groups share the same training budget.</td></tr>
+          <tr><td>samples</td><td><span class="latex">K = 4</span>; rollout batch = 8; oversample = 8; used for valid-signal score.</td></tr>
+          <tr><td>controller</td><td><span class="latex">λ<sub>sig</sub> = 1; λ<sub>info</sub> ∈ {0,1}; T = 0.25</span>; <span class="latex">λ<sub>info</sub> = 0</span> gives Signal-RLVE.</td></tr>
+          <tr><td>budget</td><td>response length = 2048.</td></tr>
+          <tr><td>evaluation</td><td>held-out eval at steps 0, 9, 19, 29.</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section class="panel-results">
+      <div class="head">
+        <h2>结果</h2>
+      </div>
+      <p>
+        受限预算实验表明，较高训练成功率并不必然转化为更强泛化；直接对准有效信号带的
+        Signal-RLVE 获得最大 held-out 改善。
+      </p>
+      <div class="figures">
+        <figure>
+          <img src="results_all_arms/figures/success_rate.png" alt="Training success rate">
+          <figcaption>训练成功率：RLVE-90 更高，但未对应最佳 held-out 表现。</figcaption>
+        </figure>
+        <figure>
+          <img src="results_all_arms/figures/heldout.png" alt="Held-out reward">
+          <figcaption>held-out reward：Signal-RLVE 在后期获得最大提升。</figcaption>
+        </figure>
+      </div>
+      <table class="result-table">
+        <tr>
+          <th>RL 难度策略</th>
+          <th>训练正确率均值<br><span class="latex">mean p</span></th>
+          <th>valid-signal score<br><span class="latex">U<sub>K</sub></span></th>
+          <th>最终泛化表现<br>held-out reward</th>
+          <th>相对初始提升<br><span class="latex">Δ</span></th>
+        </tr>
+        <tr><td>RLVE-90</td><td>0.552</td><td>0.853</td><td>−0.891</td><td>+0.016</td></tr>
+        <tr class="highlight"><td>Signal-RLVE</td><td>0.491</td><td>0.852</td><td><b>−0.813</b></td><td><b>+0.109</b></td></tr>
+        <tr><td>FEP-RLVE</td><td>0.477</td><td>0.850</td><td>−0.875</td><td>+0.031</td></tr>
+      </table>
+    </section>
+
+    <section class="span-row panel-closing">
+      <div class="head">
+        <h2>结果分析与不足</h2>
+      </div>
+      <div class="closing">
+        <div><b>结果：</b>Signal-RLVE 在 held-out reward 上取得最大提升，说明将难度控制对准有效优势信号是有价值的；RLVE-90 虽保持较高训练正确率，但泛化改善有限，支持“高正确率不等于高训练价值”的判断。</div>
+        <div><b>不足：</b>完整 FEP-RLVE 暂未超过 Signal-RLVE，主要受短训练预算、response truncation 偏高和单标量能力信念限制；当前还将各环境独立建模，难以表达跨环境共享技能、任务相关性和迁移效应。</div>
+        <div><b>后续：</b>延长训练并降低截断率后，进一步调研联合环境 belief、层级 skill belief、跨环境共享先验与多维能力状态；将环境级 posterior 从独立标量扩展为可共享、可迁移的 skill graph，以检验信息增益项在长程训练中的收益。</div>
+      </div>
+    </section>
+  </main>
+</article>
+</body>
+</html>

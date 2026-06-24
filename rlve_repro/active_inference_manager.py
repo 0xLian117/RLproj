@@ -110,6 +110,10 @@ class FEPRLVEManager(RLVEManager):
             log[f"FEP/{e}/expected_difficulty"] = round(c.expected_difficulty(), 3)
         log["FEP/effective_sample_ratio"] = round(eff_sum / eff_n, 4) if eff_n else 0.0
         log["FEP/mode"] = self.fe_mode
+        # Also echo belief metrics to stdout so they survive in the worker .out logs
+        # (wandb is the primary sink, but plot_competence.py can then run offline too).
+        belief = {k: v for k, v in log.items() if k.startswith("FEP/")}
+        print(f"[FEP-RLVE] belief {belief}", flush=True)
         return log
 
     def get_state(self) -> Dict[str, Any]:

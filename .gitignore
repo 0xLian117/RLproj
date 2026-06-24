@@ -31,3 +31,15 @@ rlve_results.tgz
 
 # OS
 .DS_Store
+
+# Redundant download archives (kept out of git)
+*.tgz
+*.zip
+
+# LaTeX build artifacts
+paper/*.aux
+paper/*.bbl
+paper/*.blg
+paper/*.out
+paper/*.log
+poster_latex.*

@@ -1,0 +1,53 @@
+% neurips_2024.sty — FALLBACK style (local-compile stand-in).
+% This is NOT the official NeurIPS style; it reproduces the look closely so the
+% paper compiles and can be proofed locally. For an actual submission, replace
+% this file with the official `neurips_2024.sty` (same filename → no edits to
+% main.tex needed) from the NeurIPS style-files page or the Overleaf template.
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{neurips_2024}[2024/01/01 fallback NeurIPS-like style]
+
+\newif\if@neurips@final\@neurips@finalfalse
+\newif\if@neurips@nonatbib\@neurips@nonatbibfalse
+\DeclareOption{final}{\@neurips@finaltrue}
+\DeclareOption{preprint}{\@neurips@finaltrue}
+\DeclareOption{nonatbib}{\@neurips@nonatbibtrue}
+\DeclareOption*{}% ignore unknown options
+\ProcessOptions\relax
+
+\RequirePackage[letterpaper,top=1.2in,bottom=1.1in,left=1.5in,right=1.5in]{geometry}
+\RequirePackage{lmodern} % fallback: full T1 coverage; official .sty uses Times
+\RequirePackage{microtype}
+\if@neurips@nonatbib\else
+  \RequirePackage{natbib}
+\fi
+
+\renewcommand{\baselinestretch}{1.0}
+\setlength{\parindent}{1em}
+\setlength{\parskip}{0pt}
+
+% ---- title / author block ----
+\renewcommand{\@maketitle}{%
+  \newpage\null\vskip 1.5em%
+  \begin{center}%
+    {\LARGE\bfseries \@title \par}%
+    \vskip 1.2em%
+    {\large \lineskip .5em \@author \par}%
+  \end{center}%
+  \vskip 1.2em\par}
+
+% ---- abstract: centered heading with rules, slightly narrower ----
+\renewenvironment{abstract}{%
+  \centerline{\large\bfseries Abstract}%
+  \vspace{0.4em}%
+  \begin{quote}\small}{%
+  \end{quote}\vspace{0.6em}}
+
+% ---- section headings ----
+\RequirePackage{titlesec}
+\titleformat{\section}{\large\bfseries}{\thesection}{0.6em}{}
+\titleformat{\subsection}{\normalsize\bfseries}{\thesubsection}{0.6em}{}
+\titleformat{\paragraph}[runin]{\normalsize\bfseries}{}{0pt}{}
+\titlespacing*{\section}{0pt}{1.2em}{0.5em}
+\titlespacing*{\subsection}{0pt}{0.8em}{0.3em}
+
+\endinput
